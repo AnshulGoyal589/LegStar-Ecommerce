@@ -102,7 +102,7 @@ export default async function AboutPage() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[500px] md:h-[600px] overflow-hidden">
+        {/* <section className="relative h-[500px] md:h-[600px] overflow-hidden">
           <Image
             src="/placeholder.svg?height=600&width=1600"
             alt="LegStar About Us"
@@ -128,10 +128,10 @@ export default async function AboutPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Stats Section */}
-        <section className="py-12 bg-primary text-primary-foreground">
+        {/* <section className="py-12 bg-primary text-primary-foreground">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((stat) => (
@@ -142,7 +142,7 @@ export default async function AboutPage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Story Section */}
         <section className="py-16 md:py-24">
