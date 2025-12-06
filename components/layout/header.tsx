@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ShoppingBag, User, Menu, X, ChevronDown } from "lucide-react"
+import { ShoppingBag, User, Menu, X, ChevronDown, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useCart } from "@/lib/cart-context"
 import { CartSheet } from "@/components/cart/cart-sheet"
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs"
+import { SignedIn, SignedOut, UserButton, useUser, useClerk  } from "@clerk/nextjs"
 
 export interface CategoryClient {
   _id: string
@@ -82,6 +81,8 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
   const { itemCount } = useCart()
   const { user } = useUser()
 
+  const { signOut } = useClerk()
+
   const structuredCategories = useMemo(() => structureCategories(allCategories), [allCategories])
 
   return (
@@ -106,10 +107,15 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80">
-              <nav className="flex flex-col gap-4 mt-8">
+              <nav className="flex flex-col gap-4 p-4 mt-8">
                 <SignedIn>
                   <div className="flex items-center gap-3 pb-4 border-b">
-                    <UserButton afterSignOutUrl="/" />
+                    <Button 
+  variant="outline" 
+  onClick={() => signOut({ redirectUrl: '/' })}
+>
+  Sign Out
+</Button>
                     <div>
                       <p className="font-medium">
                         {user?.firstName} {user?.lastName}
@@ -158,7 +164,21 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                     ))}
                   </div>
                 ))}
-                {/* ... other static links */}
+                <Link href="/best-sellers" className="text-lg font-medium">
+                  Best Sellers
+                </Link>
+                <Link href="/new-collection" className="text-lg font-medium">
+                  New
+                </Link>
+                <Link href="/blogs" className="text-lg font-medium">
+                  Blogs
+                </Link>
+                <Link href="/about" className="text-lg font-medium">
+                  About Us
+                </Link>
+                <Link href="/contact" className="text-lg font-medium">
+                  Contact Us
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
@@ -290,9 +310,14 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                     <Link href="/account/orders">My Orders</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <div className="p-2">
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
+
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    onClick={() => signOut({ redirectUrl: '/' })}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SignedIn>

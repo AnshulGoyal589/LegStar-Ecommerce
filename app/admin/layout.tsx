@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { Suspense } from "react"
+import { useUser } from "@clerk/nextjs"
 
 const sidebarLinks = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -50,6 +51,17 @@ const sidebarLinks = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+
+ const { user } = useUser();
+ if (!user?.id) {
+    return null;
+  }
+
+  const adminIds = process.env.ADMIN_CLERK_IDS?.split(",").map((id) => id.trim()) || []
+
+  if (!adminIds.includes(user.id)) {
+    return null;
+  }
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
