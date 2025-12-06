@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ShoppingBag, User, Menu, X, ChevronDown, LogOut } from "lucide-react"
+import { ShoppingBag, User, Menu, ChevronDown, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,

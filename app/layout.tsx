@@ -26,6 +26,7 @@ export default async function RootLayout({
 }>) {
   const allCategories = await getCategories() 
   const serializedCategories = JSON.parse(JSON.stringify(allCategories))
+
   return (
     <ClerkProvider>
       <html lang="en">

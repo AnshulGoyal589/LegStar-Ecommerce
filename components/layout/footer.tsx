@@ -93,17 +93,17 @@ export function Footer() {
             <h4 className="font-medium text-lg mb-4">Customer Service</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/80">
               <li>
-                <Link href="/faq" className="hover:text-[#e6d8b2] transition-colors">
-                  FAQ
+                <Link href="/contact" className="hover:text-[#e6d8b2] transition-colors">
+                  Contact & FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="hover:text-[#e6d8b2] transition-colors">
-                  Shipping Policy
+                <Link href="/refund-cancellation" className="hover:text-[#e6d8b2] transition-colors">
+                  Refund Cancellation
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="hover:text-[#e6d8b2] transition-colors">
+                <Link href="/return-exchange" className="hover:text-[#e6d8b2] transition-colors">
                   Returns & Exchange
                 </Link>
               </li>
@@ -112,32 +112,9 @@ export function Footer() {
                   Privacy Policy
                 </Link>
               </li>
-              <li>
-                <Link href="/terms" className="hover:text-[#e6d8b2] transition-colors">
-                  Terms & Conditions
-                </Link>
-              </li>
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="font-medium text-lg mb-4">Contact Us</h4>
-            <ul className="space-y-4 text-sm text-primary-foreground/80">
-              <li className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>123 Fashion Street, Mumbai, Maharashtra 400001, India</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-5 w-5 flex-shrink-0" />
-                <span>+91 1800-123-4567</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-5 w-5 flex-shrink-0" />
-                <span>support@legstar.com</span>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 

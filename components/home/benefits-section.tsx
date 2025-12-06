@@ -1,25 +1,22 @@
-import { Truck, RefreshCw, Shield, HeadphonesIcon } from "lucide-react"
+// import { Truck, RefreshCw, Shield, HeadphonesIcon } from "lucide-react"
+
+import { Feather, Wind, Recycle } from "lucide-react"
 
 const benefits = [
   {
-    icon: Truck,
-    title: "Free Shipping",
-    description: "Free delivery on orders above ₹999",
+    icon: Feather,
+    title: "Skin-friendly properties",
+    description: "Crafted from pure cotton for unmatched softness—gentle on your skin, free from irritants.",
   },
   {
-    icon: RefreshCw,
-    title: "Easy Returns",
-    description: "30-day hassle-free return policy",
+    icon: Wind,
+    title: "Breathability and comfort",
+    description: "Finely spun cotton yarn for unmatched breathability—soft, airy, and designed for all-day comfort.",
   },
   {
-    icon: Shield,
-    title: "Secure Payment",
-    description: "100% secure payment processing",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "24/7 Support",
-    description: "Dedicated customer support team",
+    icon: Recycle,
+    title: "Sustainability",
+    description: "Eco-friendly craftsmanship—designed for comfort, made for the planet.",
   },
 ]
 
