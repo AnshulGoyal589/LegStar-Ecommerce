@@ -42,10 +42,10 @@ const sidebarLinks = [
   { href: "/admin/categories", icon: FolderOpen, label: "Categories" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/coupons", icon: Tag, label: "Coupons" },
-  { href: "/admin/customers", icon: Users, label: "Customers" },
+  // { href: "/admin/customers", icon: Users, label: "Customers" },
   { href: "/admin/banners", icon: ImageIcon, label: "Banners" },
-  { href: "/admin/pages", icon: FileText, label: "Pages" },
-  { href: "/admin/settings", icon: Settings, label: "Settings" },
+  // { href: "/admin/pages", icon: FileText, label: "Pages" },
+  // { href: "/admin/settings", icon: Settings, label: "Settings" },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
