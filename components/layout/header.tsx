@@ -87,7 +87,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
   const structuredCategories = useMemo(() => structureCategories(allCategories), [allCategories])
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-card border-b border-border">
+    <header className="sticky top-0 z-90 w-full bg-card border-b border-border">
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground text-xs py-2">
         <div className="container mx-auto px-4 flex items-center justify-center gap-2">

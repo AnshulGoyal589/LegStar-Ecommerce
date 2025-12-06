@@ -4,17 +4,24 @@ import type React from "react"
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Upload, X, Plus, Trash2, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2, Plus, Trash2, X } from "lucide-react" // Removed unused 'Upload' icon
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
+import MultipleImageUpload from "@/components/MultipleImageUpload" // Assuming this component exists and works as described
+import type { Product } from "@/lib/types"
 import type { CheckedState } from "@radix-ui/react-checkbox"
-import { Product } from "@/lib/types"
+
+interface Image {
+  url: string;
+  publicId?: string;
+  alt?: string;
+}
 
 // --- Helper Types & Constants ---
 interface CategoryOption {
@@ -59,7 +66,28 @@ export default function EditProductForm({
   const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
 
-
+  // --- State Management ---
+  const [name, setName] = useState(initialProduct.name || "")
+  const [description, setDescription] = useState(initialProduct.description || "")
+  const [price, setPrice] = useState(initialProduct.price?.toString() || "")
+  const [originalPrice, setOriginalPrice] = useState(initialProduct.originalPrice?.toString() || "")
+  const [images, setImages] = useState<string[]>(initialProduct.images || [])
+  const [category, setCategory] = useState("") // Initialized below in useMemo
+  const [status, setStatus] = useState(initialProduct.status || "active")
+  const [variants, setVariants] = useState<Variant[]>(initialProduct.variantsData?.length ? initialProduct.variantsData : [{ size: "M", color: "White", stock: 50, price: 499 }])
+  const [isFeatured, setIsFeatured] = useState(initialProduct.isFeatured || false)
+  const [badge, setBadge] = useState(initialProduct.badge || "")
+  const [tags, setTags] = useState(initialProduct.tags?.join(", ") || "")
+  const [brand, setBrand] = useState(initialProduct.brand || "LegStar")
+  const [sku, setSku] = useState(initialProduct.sku || "")
+  const [barcode, setBarcode] = useState(initialProduct.barcode || "")
+  const [costPerItem, setCostPerItem] = useState(initialProduct.costPerItem?.toString() || "")
+  const [isTaxable, setIsTaxable] = useState(initialProduct.isTaxable !== false)
+  const [metaTitle, setMetaTitle] = useState(initialProduct.seo?.title || "")
+  const [metaDesc, setMetaDesc] = useState(initialProduct.seo?.description || "")
+  const [slug, setSlug] = useState(initialProduct.slug || "")
+  
+  // --- Memoized Derived State ---
   const categoryOptions = useMemo((): CategoryOption[] => {
     const categoryMap = new Map(allCategories.map((c) => [c._id, c]))
     return allCategories
@@ -76,35 +104,14 @@ export default function EditProductForm({
       .sort((a, b) => a.label.localeCompare(b.label))
   }, [allCategories])
 
-  const initialCategoryValue = useMemo(() =>
-    categoryOptions.find(opt => opt.categorySlug === initialProduct.category && opt.subcategorySlug === initialProduct.subcategory)?.value || "",
-    [categoryOptions, initialProduct]
-  );
+  // Initialize category state after options are calculated
+  useMemo(() => {
+    const initialCategoryValue = categoryOptions.find(opt => opt.categorySlug === initialProduct.category && opt.subcategorySlug === initialProduct.subcategory)?.value || ""
+    setCategory(initialCategoryValue)
+  }, [categoryOptions, initialProduct])
 
 
-  const [name, setName] = useState(initialProduct.name || "")
-  const [description, setDescription] = useState(initialProduct.description || "")
-  const [price, setPrice] = useState(initialProduct.price?.toString() || "")
-  const [originalPrice, setOriginalPrice] = useState(initialProduct.originalPrice?.toString() || "")
-  const [images, setImages] = useState<string[]>(initialProduct.images || [])
-  const [category, setCategory] = useState(initialCategoryValue)
-  const [status, setStatus] = useState(initialProduct.status || "active")
-  const [variants, setVariants] = useState<Variant[]>(initialProduct.variantsData?.length ? initialProduct.variantsData : [{ size: "M", color: "White", stock: 50, price: 499 }])
-  const [isFeatured, setIsFeatured] = useState(initialProduct.isFeatured || false)
-  const [badge, setBadge] = useState(initialProduct.badge || "")
-  const [tags, setTags] = useState(initialProduct.tags?.join(", ") || "")
-  const [brand, setBrand] = useState(initialProduct.brand || "LegStar")
-  const [sku, setSku] = useState(initialProduct.sku || "")
-  const [barcode, setBarcode] = useState(initialProduct.barcode || "")
-  const [costPerItem, setCostPerItem] = useState(initialProduct.costPerItem?.toString() || "")
-  const [isTaxable, setIsTaxable] = useState(initialProduct.isTaxable !== false)
-  const [metaTitle, setMetaTitle] = useState(initialProduct.seo?.title || "")
-  const [metaDesc, setMetaDesc] = useState(initialProduct.seo?.description || "")
-  const [slug, setSlug] = useState(initialProduct.slug || "")
-
-  const [isUploading, setIsUploading] = useState(false)
-
-
+  // --- Variant Handlers ---
   const addVariant = () => setVariants([...variants, { size: "M", color: "White", stock: 0, price: 0 }])
   const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index))
   const updateVariant = (index: number, field: keyof Variant, value: string | number) => {
@@ -113,6 +120,7 @@ export default function EditProductForm({
     setVariants(updated)
   }
 
+  // --- Form Submission ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSaving(true)
@@ -121,6 +129,12 @@ export default function EditProductForm({
       const selectedCategory = categoryOptions.find((opt) => opt.value === category)
       if (!name || !price || !selectedCategory) {
         toast({ title: "Missing Fields", description: "Name, Price, and Category are required.", variant: "destructive" })
+        setIsSaving(false)
+        return
+      }
+      
+      if (images.length === 0) {
+        toast({ title: "Missing Image", description: "At least one product image is required.", variant: "destructive" })
         setIsSaving(false)
         return
       }
@@ -146,7 +160,7 @@ export default function EditProductForm({
         isFeatured,
         badge: badge || undefined,
         status: status as Product['status'],
-        tags: tags.split(",").map((t: any) => t.trim()).filter(Boolean),
+        tags: tags.split(",").map((t: string) => t.trim()).filter(Boolean),
         brand,
         sku,
         barcode,
@@ -178,46 +192,7 @@ export default function EditProductForm({
       setIsSaving(false)
     }
   }
-
-  // This new handler will replace the inline onChange logic.
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = e.target.files
-  if (!files || files.length === 0) return
-
-  setIsUploading(true)
-  try {
-    const formData = new FormData()
-    Array.from(files).forEach((file) => {
-      formData.append("files", file)
-    })
-
-    const response = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: formData,
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.error || "Image upload failed")
-    }
-
-    // Append the new Cloudinary URLs to your images state
-    setImages((prevImages) => [...prevImages, ...data.urls])
-    toast({ title: "Success", description: `${data.urls.length} image(s) uploaded.` })
-  } catch (error) {
-    toast({
-      title: "Upload Error",
-      description: error instanceof Error ? error.message : "Something went wrong",
-      variant: "destructive",
-    })
-  } finally {
-    setIsUploading(false)
-    // Clear the file input value to allow re-uploading the same file
-    e.target.value = ""
-  }
-}
-
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -252,44 +227,15 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           </Card>
           
           <Card>
-            <CardHeader><CardTitle>Product Images</CardTitle></CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-4">
-                {images.map((image, index) => (
-                  <div key={index} className="relative aspect-square bg-muted rounded-lg overflow-hidden group">
-                    <img src={image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setImages(images.filter((_, i) => i !== index))}
-                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-                <label className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors">
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="h-6 w-6 text-muted-foreground animate-spin mb-2" />
-                      <span className="text-sm text-muted-foreground">Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-6 w-6 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">Upload</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleImageUpload}
-                    disabled={isUploading}
-                  />
-                </label>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">First image will be the main product image.</p>
+            <CardHeader><CardTitle>Product Images *</CardTitle></CardHeader>
+               {/* --- CORRECTED IMAGE UPLOAD SECTION --- */}
+               <MultipleImageUpload
+                  label="Product Images"
+                  value={images.map(url => ({ url }))}
+                  onChange={(newImages) => setImages(newImages.map(img => img.url))}
+               />
+              <CardContent>
+               <p className="text-sm text-muted-foreground mt-2">First image is the main image. Drag to reorder.</p>
             </CardContent>
           </Card>
 

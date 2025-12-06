@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import type { CheckedState } from "@radix-ui/react-checkbox"
+import MultipleImageUpload from "@/components/MultipleImageUpload"
 
 // --- TYPES for client-side data ---
 export interface CategoryClient {
@@ -284,25 +285,11 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                   </div>
                 ))}
                 <label className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors">
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="h-6 w-6 text-muted-foreground animate-spin mb-2" />
-                      <span className="text-sm text-muted-foreground">Uploading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-6 w-6 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">Upload</span>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleImageUpload}
-                    disabled={isUploading}
-                  />
+                  <MultipleImageUpload
+                    label="Product Images"
+                    value={images.map(url => ({ url }))}
+                    onChange={(newImages) => setImages(newImages.map(img => img.url))}
+                />
                 </label>
               </div>
               <p className="text-sm text-muted-foreground mt-2">First image will be the main product image.</p>

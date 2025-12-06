@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
+import MultipleImageUpload from "@/components/MultipleImageUpload"
 
 interface Banner {
   _id: string
@@ -102,6 +103,7 @@ export default function BannersPage() {
       formData.append("folder", "legstar/banners")
 
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData })
+
       if (res.ok) {
         const data = await res.json()
         setImage(data.images[0])
@@ -345,37 +347,12 @@ export default function BannersPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Banner Image *</Label>
-              {image ? (
-                <div className="relative">
-                  <img src={image.url || "/placeholder.svg"} alt="" className="w-full h-40 object-cover rounded-lg" />
-                  <button
-                    type="button"
-                    onClick={() => setImage(null)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <label className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 block">
-                  {uploading ? (
-                    <Loader2 className="h-8 w-8 mx-auto animate-spin text-muted-foreground" />
-                  ) : (
-                    <>
-                      <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">Click to upload</p>
-                      <p className="text-xs text-muted-foreground mt-1">Recommended: 1920x600px for hero</p>
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                    disabled={uploading}
+              <MultipleImageUpload 
+                    label="Banner Image (1 Required)" 
+                    value={image ? [image] : []}
+                    onChange={(images) => setImage(images[0] || null)}
+                    maxImages={1}
                   />
-                </label>
-              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="title">Banner Title *</Label>

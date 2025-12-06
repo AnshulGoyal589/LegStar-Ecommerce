@@ -31,4 +31,6 @@ export async function uploadMultipleImages(
   return Promise.all(uploadPromises)
 }
 
-export { cloudinary }
+export default cloudinary
+
+
