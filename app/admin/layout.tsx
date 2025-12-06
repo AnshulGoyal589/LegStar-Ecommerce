@@ -57,7 +57,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
-  const adminIds = process.env.ADMIN_CLERK_IDS?.split(",").map((id) => id.trim()) || []
+  // console.log("Admin User ID:", user.id);
+
+  const adminIds = process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS?.split(",").map((id) => id.trim()) || []
+
+  // console.log("Admin IDs from env:", adminIds);
+  // console.log("Is Admin:", adminIds.includes(user.id));
 
   if (!adminIds.includes(user.id)) {
     return null;
