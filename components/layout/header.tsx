@@ -14,7 +14,8 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useCart } from "@/lib/cart-context"
 import { CartSheet } from "@/components/cart/cart-sheet"
-import { SignedIn, SignedOut, UserButton, useUser, useClerk  } from "@clerk/nextjs"
+import { SignedIn, SignedOut, useUser, useClerk  } from "@clerk/nextjs"
+import Image from "next/image"
 
 export interface CategoryClient {
   _id: string
@@ -75,7 +76,7 @@ function structureCategories(allCategories: CategoryClient[]): StructuredCategor
 }
 
 export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  // const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { itemCount } = useCart()
@@ -111,11 +112,11 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                 <SignedIn>
                   <div className="flex items-center gap-3 pb-4 border-b">
                     <Button 
-  variant="outline" 
-  onClick={() => signOut({ redirectUrl: '/' })}
->
-  Sign Out
-</Button>
+                      variant="outline" 
+                      onClick={() => signOut({ redirectUrl: '/' })}
+                    >
+                      Sign Out
+                    </Button>
                     <div>
                       <p className="font-medium">
                         {user?.firstName} {user?.lastName}
@@ -185,9 +186,12 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-serif text-2xl md:text-3xl font-bold tracking-tight">
-              LEG<span className="text-[#e6d8b2]">STAR</span>
-            </span>
+            <Image
+              src="https://res.cloudinary.com/dkuhayoum/image/upload/v1765002545/5b0dde9d-52e5-4829-bfa1-ec5a8dc66815_c9stcp.jpg"
+              alt="LegStar Logo"
+              width={150}
+              height={90}
+            />
           </Link>
 
           {/* Desktop Navigation */}
