@@ -87,7 +87,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
   const structuredCategories = useMemo(() => structureCategories(allCategories), [allCategories])
 
   return (
-    <header className="sticky top-0 z-90 w-full bg-card border-b border-border">
+    <header className="sticky top-0 z-50 w-full bg-card border-b border-border">
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground text-xs py-2">
         <div className="container mx-auto px-4 flex items-center justify-center gap-2">
@@ -213,7 +213,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
 
                 {/* Mega Menu */}
                 {hoveredCategory === gender && data.categories.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-[600px] bg-card border border-border shadow-lg p-6 rounded-lg">
+                  <div className="absolute top-full left-1/2 z-90 -translate-x-1/2 w-[600px] bg-card border border-border shadow-lg p-6 rounded-lg">
                     <div className="grid grid-cols-3 gap-8">
                       {data.categories.map((cat:any) => (
                         <div key={cat.slug}>
