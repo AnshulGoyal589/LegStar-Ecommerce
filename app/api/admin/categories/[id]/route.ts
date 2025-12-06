@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/admin-auth"
 import { updateCategory, deleteCategory } from "@/lib/db/categories"
-import { deleteImage } from "@/lib/cloudinary"
+// import { deleteImage } from "@/lib/cloudinary"
 import { getDb } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 
@@ -60,10 +60,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     // Get category to delete image if exists
-    const category = await db.collection("categories").findOne({ _id: new ObjectId(id) })
-    if (category?.imagePublicId) {
-      await deleteImage(category.imagePublicId)
-    }
+    // const category = await db.collection("categories").findOne({ _id: new ObjectId(id) })
+    // if (category?.imagePublicId) {
+    //   await deleteImage(category.imagePublicId)
+    // }
 
     await deleteCategory(id)
 

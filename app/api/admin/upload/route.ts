@@ -1,44 +1,45 @@
-// app/api/upload/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import cloudinary from '@/lib/cloudinary';
+import { NextResponse } from "next/server"
+import { v2 as cloudinary } from "cloudinary"
 
-export async function POST(req: NextRequest) {
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
-    
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    const formData = await req.formData()
+    const files = formData.getAll("files") as File[]
+
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: "No files received" }, { status: 400 })
     }
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
-    // Convert buffer to base64
-    const fileStr = buffer.toString('base64');
-    const fileUri = `data:${file.type};base64,${fileStr}`;
-    
-    // Upload to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload(
-        fileUri,
-        {
-          folder: 'banners',
-        },
-        (error:any, result:any) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-    });
-    
-    return NextResponse.json(uploadResult);
+    // Process multiple uploads concurrently
+    const uploadPromises = files.map(async (file) => {
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+
+      return new Promise<string>((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "products", // Optional: Organize in a specific folder
+          },
+          (error, result) => {
+            if (error) reject(error)
+            else resolve(result!.secure_url)
+          },
+        )
+        uploadStream.end(buffer)
+      })
+    })
+
+    const urls = await Promise.all(uploadPromises)
+
+    return NextResponse.json({ urls })
   } catch (error) {
-    console.error('Error uploading to Cloudinary:', error);
-    return NextResponse.json(
-      { error: 'Error uploading image' },
-      { status: 500 }
-    );
+    console.error("Upload error:", error)
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }

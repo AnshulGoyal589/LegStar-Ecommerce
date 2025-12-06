@@ -1,150 +1,133 @@
-// components/MultipleImageUpload.tsx
-import React, { useState } from 'react';
-import { CldImage } from 'next-cloudinary';
-import { Button } from '@/components/ui/button';
+"use client"
 
-interface Image {
-  url: string;
-  publicId?: string;
-  alt?: string;
-}
+import { useEffect, useState } from "react"
+import { ImagePlus, Trash, X, Loader2 } from "lucide-react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 
 interface MultipleImageUploadProps {
-  label: string;
-  onChange: (images: Image[]) => void;
-  value: Image[];
-  maxImages?: number;
-  minImages?: number;
-  className?: string;
+  value: string[]
+  onChange: (value: string[]) => void
+  disabled?: boolean
 }
 
-const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({ 
-  label, 
-  onChange, 
-  value = [],
-  maxImages = 5,
-  minImages = 0,
-  className
+const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
+  value,
+  onChange,
+  disabled,
 }) => {
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    
-    if (value.length + files.length > maxImages) {
-      setError(`You can only upload a maximum of ${maxImages} images. Currently ${value.length}.`);
-      return;
-    }
-    
+  const [isMounted, setIsMounted] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    const formData = new FormData()
+
+    Array.from(files).forEach((file) => {
+      formData.append("files", file)
+    })
+
     try {
-      setIsUploading(true);
-      setError(null);
-      
-      const uploadedImages: Image[] = [...value];
-      
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (!file.type.includes('image')) {
-          continue;
-        }
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await fetch('/api/admin/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          throw new Error('Upload failed');
-        }
-        
-        const data = await response.json();
-        
-        uploadedImages.push({
-          url: data.secure_url,
-          publicId: data.public_id,
-          alt: file.name
-        });
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Upload failed")
       }
-      
-      onChange(uploadedImages);
+
+      // Append new URLs to existing ones
+      onChange([...value, ...data.urls])
+      toast({ title: "Success", description: "Images uploaded successfully" })
     } catch (error) {
-      console.error('Error uploading images:', error);
-      setError('Failed to upload images. Please try again.');
+      toast({
+        title: "Error",
+        description: "Something went wrong during upload.",
+        variant: "destructive",
+      })
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
+      // Reset input so the same file can be selected again if needed
+      e.target.value = ""
     }
-  };
-  
-  const handleRemove = (index: number) => {
-    const newImages = [...value];
-    newImages.splice(index, 1);
-    onChange(newImages);
-  };
-  
+  }
+
+  const onRemove = (url: string) => {
+    onChange(value.filter((current) => current !== url))
+  }
+
+  if (!isMounted) {
+    return null
+  }
+
   return (
-    <div className={className}>
-      <label className="block text-sm font-medium mb-2">
-        {label} {minImages > 0 && `(Min: ${minImages})`} {maxImages > 0 && `(Max: ${maxImages})`}
-      </label>
-      
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-        {value.map((image, index) => (
-          <div key={image.publicId || `${image.url}-${index}`} className="relative rounded-md overflow-hidden">
-            <CldImage
-              src={image.publicId || image.url}
-              width={150}
-              height={100}
-              crop="fill"
-              alt={image.alt || `Image ${index + 1}`}
-              className="w-full h-24 object-cover"
+    <div>
+      <div className="mb-4 flex items-center gap-4">
+        {value.map((url) => (
+          <div
+            key={url}
+            className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
+          >
+            <div className="z-10 absolute top-2 right-2">
+              <Button
+                type="button"
+                onClick={() => onRemove(url)}
+                variant="destructive"
+                size="icon"
+                disabled={disabled}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
+            <Image
+              fill
+              className="object-cover"
+              alt="Image"
+              src={url}
             />
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              className="absolute top-1 right-1 w-6 h-6 p-0"
-              onClick={() => handleRemove(index)}
-            >
-              ×
-            </Button>
           </div>
         ))}
       </div>
       
-      {value.length < maxImages && (
-        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-          <input
-            type="file"
-            id={`upload-${label}`}
-            className="hidden"
-            onChange={handleUpload}
-            accept="image/*"
-            multiple
-          />
-          <label
-            htmlFor={`upload-${label}`}
-            className="cursor-pointer text-[#003c95] hover:text-[#003c95]"
-          >
-            {isUploading ? (
-              <p>Uploading...</p>
-            ) : (
-              <p>Click to upload {label} ({value.length}/{maxImages})</p>
-            )}
-          </label>
-          {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
-          {minImages > 0 && value.length < minImages && (
-            <p className="text-amber-500 mt-2 text-sm">
-              Please upload at least {minImages} images (currently {value.length})
-            </p>
-          )}
-        </div>
-      )}
+      <div>
+         <label>
+            <div className="flex items-center justify-center w-[200px] h-[200px] rounded-md border-2 border-dashed border-gray-300 hover:bg-gray-50 cursor-pointer transition flex-col gap-2">
+                {isUploading ? (
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                        <p className="text-sm">Uploading...</p>
+                    </div>
+                ) : (
+                    <>
+                        <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Upload Images</span>
+                    </>
+                )}
+            </div>
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={onUpload}
+                disabled={disabled || isUploading}
+            />
+         </label>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default MultipleImageUpload;
+export default MultipleImageUpload

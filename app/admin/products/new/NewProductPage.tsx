@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Upload, X, Plus, Trash2, Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import type { CheckedState } from "@radix-ui/react-checkbox"
+// Import the new component
 import MultipleImageUpload from "@/components/MultipleImageUpload"
 
 // --- TYPES for client-side data ---
@@ -26,8 +27,8 @@ export interface CategoryClient {
 }
 
 interface CategoryOption {
-  value: string // The category _id
-  label: string // e.g., "Men > Innerwear > Briefs"
+  value: string
+  label: string
   gender: "men" | "women" | "kids" | "unknown"
   categorySlug?: string
   subcategorySlug: string
@@ -47,25 +48,22 @@ const COLOR_MAP: Record<string, string> = {
 }
 const COLORS = Object.keys(COLOR_MAP)
 
-// --- COMPONENT ---
-// It now accepts `allCategories` as a prop from the server component
 export default function NewProductPage({ allCategories }: { allCategories: CategoryClient[] }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   // --- Form State ---
-  const [images, setImages] = useState<string[]>([])
-  const [category, setCategory] = useState("") // Will now store the selected category's _id
+  const [images, setImages] = useState<string[]>([]) // Store URLs directly
+  const [category, setCategory] = useState("")
   const [status, setStatus] = useState("draft")
   const [variants, setVariants] = useState([{ size: "M", color: "White", stock: 50, price: 499 }])
-  const [isUploading, setIsUploading] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
 
   const categoryOptions = useMemo((): CategoryOption[] => {
     const categoryMap = new Map(allCategories.map((c) => [c._id, c]))
     return allCategories
-      .filter((cat) => cat.parentId) // We only want to assign products to subcategories
+      .filter((cat) => cat.parentId)
       .map((cat) => {
         const parent = cat.parentId ? categoryMap.get(cat.parentId) : undefined
         const gender: CategoryOption["gender"] =
@@ -82,7 +80,7 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
           subcategorySlug: cat.slug,
         }
       })
-      .sort((a, b) => a.label.localeCompare(b.label)) // Sort alphabetically for better UX
+      .sort((a, b) => a.label.localeCompare(b.label))
   }, [allCategories])
 
   // --- Handlers ---
@@ -103,14 +101,22 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
     try {
       const formData = new FormData(e.currentTarget)
       const name = formData.get("name") as string
-
-      // Find the selected category object from our dynamic options
       const selectedCategory = categoryOptions.find((opt) => opt.value === category)
 
       if (!name || !formData.get("price") || !selectedCategory) {
         toast({
           title: "Missing Fields",
           description: "Please fill in Name, Price, and select a valid Category.",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
+      }
+      
+      if (images.length === 0) {
+        toast({
+          title: "Images Required",
+          description: "Please upload at least one product image.",
           variant: "destructive",
         })
         setIsLoading(false)
@@ -125,26 +131,23 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
         hex: COLOR_MAP[name] || "#000000",
       }))
 
-      // Construct payload using reliable data from the selectedCategory object
       const payload = {
         name,
         slug: (formData.get("slug") as string) || generateSlug(name),
         description: formData.get("description"),
         price: Number(formData.get("price")),
         originalPrice: Number(formData.get("comparePrice")) || 0,
-        images,
+        images, // Directly passing the array of Cloudinary URLs
         category: selectedCategory.categorySlug,
         subcategory: selectedCategory.subcategorySlug,
         gender: selectedCategory.gender,
         sizes: uniqueSizes,
         colors: colorObjects,
         stock: totalStock,
-        rating: 0, // Default for new products
-        reviews: 0, // Default for new products
-        // NEW FIELDS: Added 'isFeatured' and 'badge' to match the Product schema.
+        rating: 0,
+        reviews: 0,
         isFeatured: isFeatured,
         badge: (formData.get("badge") as string) || undefined,
-        // --- Other data for backend processing ---
         status,
         sku: formData.get("sku"),
         barcode: formData.get("barcode"),
@@ -159,7 +162,6 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
         variantsData: variants,
       }
 
-      console.log("Submitting product payload:", payload)
       const response = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -181,45 +183,6 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
       setIsLoading(false)
     }
   }
-
-  // This new handler will replace the inline onChange logic.
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = e.target.files
-  if (!files || files.length === 0) return
-
-  setIsUploading(true)
-  try {
-    const formData = new FormData()
-    Array.from(files).forEach((file) => {
-      formData.append("files", file)
-    })
-
-    const response = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: formData,
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.error || "Image upload failed")
-    }
-
-    // Append the new Cloudinary URLs to your images state
-    setImages((prevImages) => [...prevImages, ...data.urls])
-    toast({ title: "Success", description: `${data.urls.length} image(s) uploaded.` })
-  } catch (error) {
-    toast({
-      title: "Upload Error",
-      description: error instanceof Error ? error.message : "Something went wrong",
-      variant: "destructive",
-    })
-  } finally {
-    setIsUploading(false)
-    // Clear the file input value to allow re-uploading the same file
-    e.target.value = ""
-  }
-}
 
   return (
     <div className="space-y-6">
@@ -265,33 +228,17 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             </CardContent>
           </Card>
 
-          {/* Images */}
+          {/* Images - INTEGRATED NEW COMPONENT */}
           <Card>
             <CardHeader>
               <CardTitle>Product Images</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-4 gap-4">
-                {images.map((image, index) => (
-                  <div key={index} className="relative aspect-square bg-muted rounded-lg overflow-hidden group">
-                    <img src={image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setImages(images.filter((_, i) => i !== index))}
-                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-                <label className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors">
-                  <MultipleImageUpload
-                    label="Product Images"
-                    value={images.map(url => ({ url }))}
-                    onChange={(newImages) => setImages(newImages.map(img => img.url))}
-                />
-                </label>
-              </div>
+              <MultipleImageUpload 
+                value={images}
+                onChange={setImages}
+                disabled={isLoading}
+              />
               <p className="text-sm text-muted-foreground mt-2">First image will be the main product image.</p>
             </CardContent>
           </Card>
@@ -416,7 +363,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                   </SelectContent>
                 </Select>
               </div>
-              {/* NEW FIELD ADDED: 'isFeatured' checkbox */}
               <div className="flex items-center space-x-2 pt-2">
                 <Checkbox
                   id="isFeatured"
@@ -430,7 +376,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             </CardContent>
           </Card>
 
-          {/* Organization - NOW DYNAMIC */}
+          {/* Organization */}
           <Card>
             <CardHeader>
               <CardTitle>Organization</CardTitle>
@@ -451,7 +397,6 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                   </SelectContent>
                 </Select>
               </div>
-              {/* NEW FIELD ADDED: 'badge' input */}
               <div className="space-y-2">
                 <Label htmlFor="badge">Badge</Label>
                 <Input id="badge" name="badge" placeholder="e.g., New Arrival, Bestseller" />

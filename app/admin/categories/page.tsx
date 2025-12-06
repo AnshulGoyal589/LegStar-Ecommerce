@@ -22,15 +22,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
-import MultipleImageUpload from "@/components/MultipleImageUpload"
+// import MultipleImageUpload from "@/components/MultipleImageUpload"
 
 interface Category {
   _id: string
   name: string
   slug: string
   description?: string
-  image?: string
-  imagePublicId?: string
+  // image?: string
+  // imagePublicId?: string
   parentId?: string | null
   gender?: string
   order: number
@@ -45,7 +45,7 @@ export default function CategoriesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  // const [uploading, setUploading] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
 
   // Form state
@@ -54,7 +54,7 @@ export default function CategoriesPage() {
   const [description, setDescription] = useState("")
   const [parentId, setParentId] = useState<string>("none")
   const [gender, setGender] = useState<string>("men")
-  const [image, setImage] = useState<{ url: string; publicId?: string } | null>(null)
+  // const [image, setImage] = useState<{ url: string; publicId?: string } | null>(null)
 
   const fetchCategories = async () => {
     try {
@@ -81,7 +81,7 @@ export default function CategoriesPage() {
     setDescription("")
     setParentId("none")
     setGender("men")
-    setImage(null)
+    // setImage(null)
     setEditingCategory(null)
   }
 
@@ -92,32 +92,32 @@ export default function CategoriesPage() {
     setDescription(category.description || "")
     setParentId(category.parentId || "none")
     setGender(category.gender || "men")
-    setImage(category.image ? { url: category.image, publicId: category.imagePublicId } : null)
+    // setImage(category.image ? { url: category.image, publicId: category.imagePublicId } : null)
     setDialogOpen(true)
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  // const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   if (!file) return
 
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("files", file)
-      formData.append("folder", "legstar/categories")
+  //   setUploading(true)
+  //   try {
+  //     const formData = new FormData()
+  //     formData.append("files", file)
+  //     formData.append("folder", "legstar/categories")
 
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData })
-      if (res.ok) {
-        const data = await res.json()
-        setImage(data.images[0])
-        toast.success("Image uploaded")
-      }
-    } catch (error) {
-      toast.error("Failed to upload image")
-    } finally {
-      setUploading(false)
-    }
-  }
+  //     const res = await fetch("/api/admin/upload", { method: "POST", body: formData })
+  //     if (res.ok) {
+  //       const data = await res.json()
+  //       setImage(data.images[0])
+  //       toast.success("Image uploaded")
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to upload image")
+  //   } finally {
+  //     setUploading(false)
+  //   }
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -130,8 +130,8 @@ export default function CategoriesPage() {
         description,
         parentId: parentId === "none" ? null : parentId,
         gender,
-        image: image?.url,
-        imagePublicId: image?.publicId,
+        // image: image?.url,
+        // imagePublicId: image?.publicId,
       }
 
       const url = editingCategory ? `/api/admin/categories/${editingCategory._id}` : "/api/admin/categories"
@@ -245,15 +245,15 @@ export default function CategoriesPage() {
                       />
                     </button>
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center overflow-hidden">
-                      {category.image ? (
+                      {/* {category.image ? (
                         <img
                           src={category.image || "/placeholder.svg"}
                           alt={category.name}
                           className="w-full h-full object-cover"
                         />
-                      ) : (
+                      ) : ( */}
                         <FolderOpen className="h-5 w-5 text-primary" />
-                      )}
+                      {/* )} */}
                     </div>
                     <div>
                       <h3 className="font-medium">{category.name}</h3>
@@ -291,15 +291,15 @@ export default function CategoriesPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                            {child.image ? (
-                              <img
-                                src={child.image || "/placeholder.svg"}
-                                alt={child.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
+                              {/* {child.image ? (
+                                <img
+                                  src={child.image || "/placeholder.svg"}
+                                  alt={child.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : ( */}
                               <Package className="h-4 w-4 text-muted-foreground" />
-                            )}
+                             {/* )} */}
                           </div>
                           <div>
                             <h4 className="font-medium">{child.name}</h4>
@@ -394,7 +394,7 @@ export default function CategoriesPage() {
                 rows={3}
               />
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label>Category Image</Label>
               <MultipleImageUpload 
                     label="Banner Image (1 Required)" 
@@ -402,7 +402,7 @@ export default function CategoriesPage() {
                     onChange={(images) => setImage(images[0] || null)}
                     maxImages={1}
                   />
-            </div>
+            </div> */}
             <div className="flex gap-2">
               <Button
                 type="button"

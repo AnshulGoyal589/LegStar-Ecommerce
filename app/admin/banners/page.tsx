@@ -43,7 +43,7 @@ export default function BannersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  // const [uploading, setUploading] = useState(false)
 
   // Form state
   const [title, setTitle] = useState("")
@@ -51,7 +51,8 @@ export default function BannersPage() {
   const [position, setPosition] = useState<"hero" | "sidebar" | "popup">("hero")
   const [order, setOrder] = useState(1)
   const [active, setActive] = useState(true)
-  const [image, setImage] = useState<{ url: string; publicId?: string } | null>(null)
+  const [images, setImages] = useState<string[]>([])
+  // const [image, setImage] = useState<{ url: string; publicId?: string } | null>(null)
 
   const fetchBanners = async () => {
     try {
@@ -77,7 +78,7 @@ export default function BannersPage() {
     setPosition("hero")
     setOrder(1)
     setActive(true)
-    setImage(null)
+    setImages([]) // Changed from setImage(null)
     setEditingBanner(null)
   }
 
@@ -88,37 +89,15 @@ export default function BannersPage() {
     setPosition(banner.position)
     setOrder(banner.order)
     setActive(banner.active)
-    setImage(banner.image ? { url: banner.image, publicId: banner.imagePublicId } : null)
+    // Convert single image string to array for the component
+    setImages(banner.image ? [banner.image] : []) 
     setDialogOpen(true)
   }
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("files", file)
-      formData.append("folder", "legstar/banners")
-
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData })
-
-      if (res.ok) {
-        const data = await res.json()
-        setImage(data.images[0])
-        toast.success("Image uploaded")
-      }
-    } catch (error) {
-      toast.error("Failed to upload image")
-    } finally {
-      setUploading(false)
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!image) {
+    
+    // Check array length
+    if (images.length === 0) {
       toast.error("Please upload an image")
       return
     }
@@ -131,8 +110,8 @@ export default function BannersPage() {
         position,
         order,
         active,
-        image: image.url,
-        imagePublicId: image.publicId,
+        image: images[0], // Extract the first URL
+        // Removed imagePublicId as the new simple uploader only returns URLs
       }
 
       const url = editingBanner ? `/api/admin/banners/${editingBanner._id}` : "/api/admin/banners"
@@ -143,6 +122,8 @@ export default function BannersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
+      
+      // ... rest of the function remains the same
 
       if (res.ok) {
         toast.success(editingBanner ? "Banner updated" : "Banner created")
@@ -345,14 +326,18 @@ export default function BannersPage() {
             <DialogTitle>{editingBanner ? "Edit Banner" : "Add New Banner"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Inside the <form> in the DialogContent */}
+
             <div className="space-y-2">
               <Label>Banner Image *</Label>
               <MultipleImageUpload 
-                    label="Banner Image (1 Required)" 
-                    value={image ? [image] : []}
-                    onChange={(images) => setImage(images[0] || null)}
-                    maxImages={1}
-                  />
+                value={images}
+                onChange={setImages}
+                disabled={saving}
+              />
+              <p className="text-xs text-muted-foreground">
+                Upload the banner image. If multiple are uploaded, the first one will be used.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="title">Banner Title *</Label>

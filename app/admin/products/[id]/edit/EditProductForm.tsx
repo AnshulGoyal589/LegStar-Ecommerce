@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Plus, Trash2, X } from "lucide-react" // Removed unused 'Upload' icon
+import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,15 +13,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import MultipleImageUpload from "@/components/MultipleImageUpload" // Assuming this component exists and works as described
+import MultipleImageUpload from "@/components/MultipleImageUpload"
 import type { Product } from "@/lib/types"
 import type { CheckedState } from "@radix-ui/react-checkbox"
-
-interface Image {
-  url: string;
-  publicId?: string;
-  alt?: string;
-}
 
 // --- Helper Types & Constants ---
 interface CategoryOption {
@@ -47,13 +41,12 @@ const COLOR_MAP: Record<string, string> = {
 const COLORS = Object.keys(COLOR_MAP)
 
 export interface CategoryClient {
-    _id: string;
-    name: string;
-    slug: string;
-    parentId?: string | null;
-    gender?: "men" | "women" | "kids";
+  _id: string;
+  name: string;
+  slug: string;
+  parentId?: string | null;
+  gender?: "men" | "women" | "kids";
 }
-
 
 export default function EditProductForm({
   initialProduct,
@@ -71,8 +64,11 @@ export default function EditProductForm({
   const [description, setDescription] = useState(initialProduct.description || "")
   const [price, setPrice] = useState(initialProduct.price?.toString() || "")
   const [originalPrice, setOriginalPrice] = useState(initialProduct.originalPrice?.toString() || "")
+  
+  // Images is strictly string[] based on the MultipleImageUpload component
   const [images, setImages] = useState<string[]>(initialProduct.images || [])
-  const [category, setCategory] = useState("") // Initialized below in useMemo
+  
+  const [category, setCategory] = useState("") 
   const [status, setStatus] = useState(initialProduct.status || "active")
   const [variants, setVariants] = useState<Variant[]>(initialProduct.variantsData?.length ? initialProduct.variantsData : [{ size: "M", color: "White", stock: 50, price: 499 }])
   const [isFeatured, setIsFeatured] = useState(initialProduct.isFeatured || false)
@@ -86,7 +82,7 @@ export default function EditProductForm({
   const [metaTitle, setMetaTitle] = useState(initialProduct.seo?.title || "")
   const [metaDesc, setMetaDesc] = useState(initialProduct.seo?.description || "")
   const [slug, setSlug] = useState(initialProduct.slug || "")
-  
+
   // --- Memoized Derived State ---
   const categoryOptions = useMemo((): CategoryOption[] => {
     const categoryMap = new Map(allCategories.map((c) => [c._id, c]))
@@ -110,7 +106,6 @@ export default function EditProductForm({
     setCategory(initialCategoryValue)
   }, [categoryOptions, initialProduct])
 
-
   // --- Variant Handlers ---
   const addVariant = () => setVariants([...variants, { size: "M", color: "White", stock: 0, price: 0 }])
   const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index))
@@ -132,7 +127,7 @@ export default function EditProductForm({
         setIsSaving(false)
         return
       }
-      
+
       if (images.length === 0) {
         toast({ title: "Missing Image", description: "At least one product image is required.", variant: "destructive" })
         setIsSaving(false)
@@ -150,7 +145,7 @@ export default function EditProductForm({
         description,
         price: parseFloat(price) || 0,
         originalPrice: parseFloat(originalPrice) || 0,
-        images,
+        images, // Directly send the string array of URLs
         category: selectedCategory.categorySlug,
         subcategory: selectedCategory.subcategorySlug,
         gender: selectedCategory.gender === "unknown" ? undefined : selectedCategory.gender,
@@ -192,7 +187,7 @@ export default function EditProductForm({
       setIsSaving(false)
     }
   }
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -225,17 +220,17 @@ export default function EditProductForm({
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader><CardTitle>Product Images *</CardTitle></CardHeader>
+            <CardContent>
                {/* --- CORRECTED IMAGE UPLOAD SECTION --- */}
                <MultipleImageUpload
-                  label="Product Images"
-                  value={images.map(url => ({ url }))}
-                  onChange={(newImages) => setImages(newImages.map(img => img.url))}
+                  value={images}
+                  onChange={setImages}
+                  disabled={isSaving}
                />
-              <CardContent>
-               <p className="text-sm text-muted-foreground mt-2">First image is the main image. Drag to reorder.</p>
+               <p className="text-sm text-muted-foreground mt-2">First image is the main image.</p>
             </CardContent>
           </Card>
 
