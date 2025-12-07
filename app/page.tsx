@@ -10,6 +10,8 @@ import { getFeaturedProducts } from "@/lib/db/products"
 import PromotionalImage from "@/components/home/promotional-image"
 import PromotionalVideo from "@/components/home/promotional-video"
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   // const allCategories = await getCategories()
   const heroBanners = await getBanners("hero")

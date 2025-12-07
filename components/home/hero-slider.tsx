@@ -22,9 +22,6 @@ export function HeroSlider({ banners }: { banners: BannerClient[] }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
-  // 3. Remove the static 'slides' array
-  // const slides = [ ... ]
-
   // If there are no banners, don't render the component
   if (!banners || banners.length === 0) {
     return (

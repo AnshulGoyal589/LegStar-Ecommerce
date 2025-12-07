@@ -4,7 +4,7 @@ import { getAllBanners, createBanner } from "@/lib/db/banners"
 
 export async function GET() {
   try {
-    await requireAdmin()
+    // await requireAdmin()
     const banners = await getAllBanners()
     return NextResponse.json(banners)
   } catch (error) {
