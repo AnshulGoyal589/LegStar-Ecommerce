@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Plus, MoreHorizontal, Edit, Trash2, Eye, EyeOff, GripVertical, Upload, Loader2, X } from "lucide-react"
+import { Plus, MoreHorizontal, Edit, Trash2, Eye, EyeOff, GripVertical, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -43,7 +43,6 @@ export default function BannersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [saving, setSaving] = useState(false)
-  // const [uploading, setUploading] = useState(false)
 
   // Form state
   const [title, setTitle] = useState("")
@@ -52,7 +51,6 @@ export default function BannersPage() {
   const [order, setOrder] = useState(1)
   const [active, setActive] = useState(true)
   const [images, setImages] = useState<string[]>([])
-  // const [image, setImage] = useState<{ url: string; publicId?: string } | null>(null)
 
   const fetchBanners = async () => {
     try {
@@ -78,7 +76,7 @@ export default function BannersPage() {
     setPosition("hero")
     setOrder(1)
     setActive(true)
-    setImages([]) // Changed from setImage(null)
+    setImages([])
     setEditingBanner(null)
   }
 
@@ -89,14 +87,12 @@ export default function BannersPage() {
     setPosition(banner.position)
     setOrder(banner.order)
     setActive(banner.active)
-    // Convert single image string to array for the component
-    setImages(banner.image ? [banner.image] : []) 
+    setImages(banner.image ? [banner.image] : [])
     setDialogOpen(true)
   }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Check array length
+
     if (images.length === 0) {
       toast.error("Please upload an image")
       return
@@ -110,8 +106,7 @@ export default function BannersPage() {
         position,
         order,
         active,
-        image: images[0], // Extract the first URL
-        // Removed imagePublicId as the new simple uploader only returns URLs
+        image: images[0],
       }
 
       const url = editingBanner ? `/api/admin/banners/${editingBanner._id}` : "/api/admin/banners"
@@ -122,8 +117,6 @@ export default function BannersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      
-      // ... rest of the function remains the same
 
       if (res.ok) {
         toast.success(editingBanner ? "Banner updated" : "Banner created")
@@ -189,8 +182,9 @@ export default function BannersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 p-4 md:p-6">
+      {/* MODIFIED: Added flex-wrap and gap-4 for responsiveness */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Banners</h1>
           <p className="text-muted-foreground">Manage homepage and promotional banners</p>
@@ -215,25 +209,30 @@ export default function BannersPage() {
             <p className="text-muted-foreground">No hero banners yet</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {heroBanners.map((banner) => (
               <div
                 key={banner._id}
-                className={`flex items-center gap-4 p-4 bg-background border rounded-lg ${!banner.active ? "opacity-60" : ""}`}
+                // MODIFIED: Stacks vertically on mobile, horizontally on larger screens
+                className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-background border rounded-lg ${
+                  !banner.active ? "opacity-60" : ""
+                }`}
               >
-                <button className="cursor-grab text-muted-foreground hover:text-foreground">
+                <button className="hidden sm:block cursor-grab text-muted-foreground hover:text-foreground">
                   <GripVertical className="h-5 w-5" />
                 </button>
                 <img
                   src={banner.image || "/placeholder.svg"}
                   alt={banner.title}
-                  className="w-32 h-16 object-cover rounded"
+                  // MODIFIED: Image is larger on mobile, scales down on desktop
+                  className="w-full h-32 sm:w-32 sm:h-16 object-cover rounded-md"
                 />
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                   <h3 className="font-medium">{banner.title}</h3>
-                  <p className="text-sm text-muted-foreground">{banner.link}</p>
+                  <p className="text-sm text-muted-foreground truncate">{banner.link}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                {/* MODIFIED: Actions container aligns itself properly on mobile vs desktop */}
+                <div className="w-full sm:w-auto flex items-center justify-end sm:justify-start gap-2">
                   {banner.active ? (
                     <span className="flex items-center gap-1 text-sm text-green-600">
                       <Eye className="h-4 w-4" /> Active
@@ -277,7 +276,8 @@ export default function BannersPage() {
             <p className="text-muted-foreground">No sidebar banners yet</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          // UNCHANGED: This grid is already responsive (mobile-first)
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sidebarBanners.map((banner) => (
               <div
                 key={banner._id}
@@ -321,20 +321,14 @@ export default function BannersPage() {
           setDialogOpen(open)
         }}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingBanner ? "Edit Banner" : "Add New Banner"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Inside the <form> in the DialogContent */}
-
+          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             <div className="space-y-2">
               <Label>Banner Image *</Label>
-              <MultipleImageUpload 
-                value={images}
-                onChange={setImages}
-                disabled={saving}
-              />
+              <MultipleImageUpload value={images} onChange={setImages} disabled={saving} />
               <p className="text-xs text-muted-foreground">
                 Upload the banner image. If multiple are uploaded, the first one will be used.
               </p>
@@ -352,7 +346,8 @@ export default function BannersPage() {
                 placeholder="/products or https://..."
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            {/* MODIFIED: Stacks to 1 column on mobile, 2 columns on larger screens */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Position</Label>
                 <Select value={position} onValueChange={(v) => setPosition(v as "hero" | "sidebar" | "popup")}>
@@ -371,20 +366,22 @@ export default function BannersPage() {
                 <Input type="number" value={order} onChange={(e) => setOrder(Number.parseInt(e.target.value) || 1)} />
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="active">Active</Label>
+            <div className="flex items-center justify-between py-2">
+              <Label htmlFor="active" className="cursor-pointer">
+                Active
+              </Label>
               <Switch id="active" checked={active} onCheckedChange={setActive} />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col-reverse sm:flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1 bg-transparent"
+                className="w-[50%]"
                 onClick={() => setDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1" disabled={saving}>
+              <Button type="submit" className="w-[50%]" disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : editingBanner ? "Update" : "Add Banner"}
               </Button>
             </div>
