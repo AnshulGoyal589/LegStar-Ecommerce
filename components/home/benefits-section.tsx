@@ -24,7 +24,7 @@ export function BenefitsSection() {
   return (
     <section className="py-12 bg-card border-y border-border">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
           {benefits.map((benefit) => (
             <div key={benefit.title} className="flex flex-col items-center text-center">
               <div className="h-14 w-14 rounded-full bg-[#e6d8b2]/30 flex items-center justify-center mb-4">

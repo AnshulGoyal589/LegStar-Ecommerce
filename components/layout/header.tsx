@@ -165,12 +165,12 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                     ))}
                   </div>
                 ))}
-                <Link href="/best-sellers" className="text-lg font-medium">
+                {/* <Link href="/best-sellers" className="text-lg font-medium">
                   Best Sellers
                 </Link>
                 <Link href="/new-collection" className="text-lg font-medium">
                   New
-                </Link>
+                </Link> */}
                 <Link href="/blogs" className="text-lg font-medium">
                   Blogs
                 </Link>
@@ -248,7 +248,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
               </div>
             ))}
 
-            <Link
+            {/* <Link
               href="/best-sellers"
               className="text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors"
             >
@@ -259,7 +259,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
               className="text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors"
             >
               New
-            </Link>
+            </Link> */}
              <Link
               href="/blogs"
               className="text-sm font-medium uppercase tracking-wide hover:text-muted-foreground transition-colors"
