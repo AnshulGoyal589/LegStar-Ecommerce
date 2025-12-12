@@ -11,14 +11,6 @@ interface Props {
 export default async function OrderConfirmationPage({ params }: Props) {
   const { orderId } = await params
   const order = await getOrderByOrderId(orderId)
-  // In production, fetch order details from database
-  // const order = {
-  //   id: orderId,
-  //   status: "confirmed",
-  //   total: "₹2,597",
-  //   estimatedDelivery: "3-5 business days",
-  // }
-
   return (
     <main className="min-h-screen bg-muted/30 py-12">
       <div className="container mx-auto px-4 max-w-2xl">

@@ -12,7 +12,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 // import { getCategories } from "@/lib/db/categories"
 
-export default async function CartPage() {
+export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, clearCart } = useCart()
   const [couponCode, setCouponCode] = useState("")
   const [discount, setDiscount] = useState(0)
@@ -21,16 +21,26 @@ export default async function CartPage() {
   const total = subtotal - discount + shipping
 
   const applyCoupon = () => {
-    // Mock coupon validation
-    if (couponCode.toUpperCase() === "SAVE10") {
-      const discountAmount = Math.round(subtotal * 0.1)
-      setDiscount(discountAmount)
-      toast.success("Coupon applied!", {
-        description: `You saved ₹${discountAmount}`,
+    const response = fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: couponCode, amount: subtotal }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.valid) {
+          setDiscount(data.discount)
+          toast.success(`Coupon applied! You saved ₹${data.discount}.`)
+        } else {
+          setDiscount(0)
+          toast.error(data.error || "Invalid coupon code.")
+        }
       })
-    } else {
-      toast.error("Invalid coupon code")
-    }
+      .catch(() => {
+        toast.error("Something went wrong while applying the coupon.")
+      })
   }
 
 
@@ -165,7 +175,7 @@ export default async function CartPage() {
                       Apply
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Try &quot;SAVE10&quot; for 10% off</p>
+                  {/* <p className="text-xs text-muted-foreground mt-1">Try &quot;SAVE10&quot; for 10% off</p> */}
                 </div>
 
                 <div className="space-y-3 text-sm border-t border-border pt-4">
@@ -173,19 +183,19 @@ export default async function CartPage() {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>₹{subtotal}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
+                  </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
                       <span>-₹{discount}</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
-                  </div>
-                  {shipping > 0 && (
+                  {/* {shipping > 0 && (
                     <p className="text-xs text-muted-foreground">Add ₹{999 - subtotal} more for free shipping</p>
-                  )}
+                  )} */}
                   <div className="flex justify-between font-bold text-lg pt-3 border-t border-border">
                     <span>Total</span>
                     <span>₹{total}</span>

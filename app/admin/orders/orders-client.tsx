@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator"
 import { Order } from "@/lib/db/orders" // Import types only
 import { fetchOrdersAction } from "./actions" // Import the Server Action
 
-// --- Helpers ---
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -360,20 +359,20 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>{formatCurrency(selectedOrder.subtotal)}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span>{selectedOrder.shippingCost === 0 ? "Free" : formatCurrency(selectedOrder.shippingCost)}</span>
+                  </div>
                   {selectedOrder.discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
                       <span>-{formatCurrency(selectedOrder.discount)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span>{selectedOrder.shippingCost === 0 ? "Free" : formatCurrency(selectedOrder.shippingCost)}</span>
-                  </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax</span>
                     <span>{formatCurrency(selectedOrder.tax)}</span>
-                  </div>
+                  </div> */}
                   <Separator className="my-2" />
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>

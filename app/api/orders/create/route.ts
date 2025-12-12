@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const shippingCost = subtotal >= 999 ? 0 : 99
-    const tax = Math.round((subtotal - discount) * 0.05)
+    const tax = Math.round((subtotal - discount) * 0.18)
     const total = subtotal - discount + shippingCost + tax
 
     // Generate order ID

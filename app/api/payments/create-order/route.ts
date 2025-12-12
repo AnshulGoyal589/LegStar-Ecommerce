@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { amount, items, shippingAddress, couponCode } = body
 
-    // Validate coupon if provided
     let discount = 0
     if (couponCode) {
       const couponResult = await validateCoupon(couponCode, amount, userId)
@@ -39,32 +38,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate totals using the correct nested data structure
-    const subtotal = (items as IncomingCartItem[]).reduce((acc, item) => {
-      const itemPrice = Number(item?.product?.price) || 0
-      const itemQuantity = Number(item?.quantity) || 0
-      return acc + itemPrice * itemQuantity
-    }, 0)
+    // const subtotal = (items as IncomingCartItem[]).reduce((acc, item) => {
+    //   const itemPrice = Number(item?.product?.price) || 0
+    //   const itemQuantity = Number(item?.quantity) || 0
+    //   return acc + itemPrice * itemQuantity
+    // }, 0)
 
-    const shippingCost = subtotal >= 999 ? 0 : 99
-    const tax = Math.round((subtotal - discount) * 0.05)
-    const total = subtotal - discount + shippingCost + tax
+    // const shippingCost = amount >= 999 ? 0 : 99
+          // const tax = Math.round((subtotal - discount) * 0.05)
+    // const total = amount + shippingCost;
 
-    if (!total || total <= 0) {
+    if (!amount || amount <= 0) {
       return NextResponse.json(
         { error: "Invalid order amount. Total must be greater than zero." },
         { status: 400 },
       )
     }
 
-    // Generate order ID
     const orderId = await generateOrderId()
 
-    // Create Razorpay order
-    const razorpayOrder = await createRazorpayOrder(total, orderId)
+    const razorpayOrder = await createRazorpayOrder(amount, orderId)
 
-    // --- THIS IS THE CORRECTED SECTION ---
-    // Save the order to the database with a correctly flattened item structure
     await createOrder({
       orderId,
       userId,
@@ -82,12 +76,12 @@ export async function POST(request: NextRequest) {
         color: item.color,
         image: item.product.images?.[0] || "", // Safely get the first image
       })),
-      subtotal,
+      subtotal: amount,
       discount,
       couponCode: couponCode || undefined,
-      shippingCost,
-      tax,
-      total,
+      shippingCost:99,
+      // tax,
+      total: amount,
       shippingAddress: {
         name: shippingAddress.name,
         phone: shippingAddress.phone,
@@ -111,7 +105,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       orderId,
       razorpayOrderId: razorpayOrder.id,
-      amount: total,
+      amount,
     })
   } catch (error) {
     console.error("Error creating order:", error)

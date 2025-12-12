@@ -32,18 +32,25 @@ export default function CheckoutPage() {
   })
 
   const shippingCost = subtotal >= 999 ? 0 : 99
-  const tax = Math.round((subtotal - discount) * 0.05)
-  const total = subtotal - discount + shippingCost + tax
+
+  
+  // const tax = Math.round((subtotal - discount) * 0.05)
+  const total = subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)
 
   const applyCoupon = async () => {
-    // In production, this would call the API to validate coupon
-    if (couponCode.toUpperCase() === "WELCOME10") {
-      const discountAmount = Math.min(subtotal * 0.1, 200)
-      setDiscount(discountAmount)
-    } else if (couponCode.toUpperCase() === "FLAT200") {
-      if (subtotal >= 1000) {
-        setDiscount(200)
-      }
+    
+    const response = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponCode, orderTotal: subtotal + shippingCost + (paymentMethod==='cod' ? 10 : 0)  }),
+    })
+    const data = await response.json()
+
+    if (data.valid) {
+      setDiscount(data.discount || 0)
+    } else {
+      setDiscount(0)
+      // Optionally, show an error message to the user
     }
   }
 
@@ -53,6 +60,8 @@ export default function CheckoutPage() {
     try {
       if (paymentMethod === "razorpay") {
         // Create order and initiate Razorpay payment
+
+        // console.log("Initiating Razorpay payment for amount:", total);
         const response = await fetch("/api/payments/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -113,13 +122,13 @@ export default function CheckoutPage() {
         }
       } else {
         // COD Order
-        const response = await fetch("/api/orders/create", {
+        const response = await fetch("/api/payments/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            amount: total,
             items,
             shippingAddress,
-            paymentMethod: "cod",
             couponCode: couponCode || undefined,
           }),
         })
@@ -327,20 +336,24 @@ export default function CheckoutPage() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>₹{subtotal}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span>{shippingCost === 0 ? "FREE" : `₹${shippingCost}`}</span>
+                </div>
+                {
+                  paymentMethod=='razorpay' ? null : (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">COD charges</span>
+                  <span>₹10</span>
+                </div>
+                  )
+                }
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
                     <span>-₹{discount}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{shippingCost === 0 ? "FREE" : `₹${shippingCost}`}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax (5% GST)</span>
-                  <span>₹{tax}</span>
-                </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>

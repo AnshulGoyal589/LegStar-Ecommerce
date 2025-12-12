@@ -24,7 +24,7 @@ export interface Order {
   discount: number
   couponCode?: string
   shippingCost: number
-  tax: number
+  // tax: number
   total: number
   shippingAddress: {
     name: string
