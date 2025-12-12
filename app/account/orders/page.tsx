@@ -93,7 +93,7 @@ export default async function OrdersPage() {
                         </div>
                         <p className="font-medium">{item.price}</p>
                       </div>
-                    ))}
+                    ))} 
                   </div>
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
