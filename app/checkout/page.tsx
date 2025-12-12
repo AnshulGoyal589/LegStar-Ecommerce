@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   })
 
   const shippingCost = subtotal >= 999 ? 0 : 99
-  const tax = Math.round((subtotal - discount) * 0.18)
+  const tax = Math.round((subtotal - discount) * 0.05)
   const total = subtotal - discount + shippingCost + tax
 
   const applyCoupon = async () => {
@@ -338,7 +338,7 @@ export default function CheckoutPage() {
                   <span>{shippingCost === 0 ? "FREE" : `₹${shippingCost}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax (18% GST)</span>
+                  <span className="text-muted-foreground">Tax (5% GST)</span>
                   <span>₹{tax}</span>
                 </div>
                 <Separator className="my-2" />

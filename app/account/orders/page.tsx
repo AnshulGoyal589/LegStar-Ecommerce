@@ -4,35 +4,8 @@ import Link from "next/link"
 import { ArrowLeft, Package, Truck, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { getOrdersByUserId } from "@/lib/db/orders"
 
-// Mock orders data - in production, this would come from the database
-const orders = [
-  {
-    id: "ORD-2024-000001",
-    date: "2024-01-15",
-    total: "₹2,597",
-    status: "delivered",
-    items: [
-      {
-        name: "Classic Cotton Brief - 3 Pack",
-        quantity: 2,
-        price: "₹998",
-        image: "/placeholder.svg?height=80&width=80",
-      },
-      { name: "Premium Vest - White", quantity: 1, price: "₹599", image: "/placeholder.svg?height=80&width=80" },
-    ],
-  },
-  {
-    id: "ORD-2024-000002",
-    date: "2024-01-20",
-    total: "₹1,498",
-    status: "shipped",
-    items: [
-      { name: "Sports Trunk - Black", quantity: 2, price: "₹1,198", image: "/placeholder.svg?height=80&width=80" },
-      { name: "Kids Comfort Brief", quantity: 1, price: "₹300", image: "/placeholder.svg?height=80&width=80" },
-    ],
-  },
-]
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -65,6 +38,8 @@ export default async function OrdersPage() {
     redirect("/sign-in")
   }
 
+  const orders = await getOrdersByUserId(user.id)
+
   return (
     <main className="min-h-screen bg-muted/30 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -91,16 +66,16 @@ export default async function OrdersPage() {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => (
-              <Card key={order.id}>
+              <Card key={order.orderId}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4 pb-4 border-b">
                     <div>
-                      <p className="font-semibold">{order.id}</p>
-                      <p className="text-sm text-muted-foreground">Ordered on {order.date}</p>
+                      <p className="font-semibold">{order.orderId}</p>
+                      <p className="text-sm text-muted-foreground">Ordered on {order.createdAt.toLocaleDateString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {getStatusIcon(order.status)}
-                      <span className="font-medium">{getStatusLabel(order.status)}</span>
+                      {getStatusIcon(order.orderStatus)}
+                      <span className="font-medium">{getStatusLabel(order.orderStatus)}</span>
                     </div>
                   </div>
 
@@ -123,7 +98,7 @@ export default async function OrdersPage() {
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <p className="font-semibold">Total: {order.total}</p>
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       {order.status === "shipped" && (
                         <Button variant="outline" size="sm">
                           Track Order
@@ -132,7 +107,7 @@ export default async function OrdersPage() {
                       <Button variant="outline" size="sm">
                         View Details
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </CardContent>
               </Card>

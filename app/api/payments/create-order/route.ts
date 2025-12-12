@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }, 0)
 
     const shippingCost = subtotal >= 999 ? 0 : 99
-    const tax = Math.round((subtotal - discount) * 0.18)
+    const tax = Math.round((subtotal - discount) * 0.05)
     const total = subtotal - discount + shippingCost + tax
 
     if (!total || total <= 0) {

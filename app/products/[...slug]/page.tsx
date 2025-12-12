@@ -40,12 +40,13 @@ export default async function ProductCatchAllPage({
     })
 
     const filteredRelated = relatedProducts.filter((p) => p._id !== product._id)
-    const serializedProduct = JSON.parse(JSON.stringify(product))
 
+    const serializedProduct = JSON.parse(JSON.stringify(product))
+    const serializedRelated = JSON.parse(JSON.stringify(filteredRelated))
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1">
-          <ProductDetail product={serializedProduct} relatedProducts={filteredRelated} />
+          <ProductDetail product={serializedProduct} relatedProducts={serializedRelated} />
         </main>
         <Footer />
       </div>

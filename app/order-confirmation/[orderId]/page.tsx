@@ -2,6 +2,7 @@ import Link from "next/link"
 import { CheckCircle2, Package, Truck, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { getOrderByOrderId } from "@/lib/db/orders"
 
 interface Props {
   params: Promise<{ orderId: string }>
@@ -9,14 +10,14 @@ interface Props {
 
 export default async function OrderConfirmationPage({ params }: Props) {
   const { orderId } = await params
-
+  const order = await getOrderByOrderId(orderId)
   // In production, fetch order details from database
-  const order = {
-    id: orderId,
-    status: "confirmed",
-    total: "₹2,597",
-    estimatedDelivery: "3-5 business days",
-  }
+  // const order = {
+  //   id: orderId,
+  //   status: "confirmed",
+  //   total: "₹2,597",
+  //   estimatedDelivery: "3-5 business days",
+  // }
 
   return (
     <main className="min-h-screen bg-muted/30 py-12">
@@ -36,11 +37,11 @@ export default async function OrderConfirmationPage({ params }: Props) {
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
                 <p className="text-sm text-muted-foreground">Order Number</p>
-                <p className="font-bold text-lg">{order.id}</p>
+                <p className="font-bold text-lg">{order?.orderId}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="font-bold text-lg">{order.total}</p>
+                <p className="font-bold text-lg">INR {order?.total}</p>
               </div>
             </div>
           </CardContent>
@@ -59,7 +60,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
                   <p className="text-sm text-muted-foreground">We're preparing your order for shipment</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
+              {/* <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center shrink-0">
                   <Truck className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -67,7 +68,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
                   <p className="font-medium">Shipping</p>
                   <p className="text-sm text-muted-foreground">Estimated delivery: {order.estimatedDelivery}</p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </CardContent>
         </Card>
