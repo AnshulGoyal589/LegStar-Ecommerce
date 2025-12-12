@@ -98,7 +98,7 @@ export default async function OrdersPage() {
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <p className="font-semibold">Total: {order.total}</p>
-                    {/* <div className="flex gap-2">
+                    {/* <div className="flex gap-2"> 
                       {order.status === "shipped" && (
                         <Button variant="outline" size="sm">
                           Track Order
