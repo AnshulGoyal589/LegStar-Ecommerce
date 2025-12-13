@@ -35,8 +35,7 @@ export default function CheckoutPage() {
   const shippingCost = subtotal >= 999 ? 0 : 99
 
   
-  // const tax = Math.round((subtotal - discount) * 0.05)
-  const total = (subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)).toFixed(2)
+  const total = (subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)).toFixed(0)
 
   const applyCoupon = async () => {
     

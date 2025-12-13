@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    
+
     const orderId = await generateOrderId()
 
     const razorpayOrder = await createRazorpayOrder(amount, orderId)
@@ -76,12 +78,12 @@ export async function POST(request: NextRequest) {
         color: item.color,
         image: item.product.images?.[0] || "", // Safely get the first image
       })),
-      subtotal: amount,
+      subtotal: parseInt(amount),
       discount,
       couponCode: couponCode || undefined,
       shippingCost:99,
       // tax,
-      total: amount,
+      total: parseInt(amount),
       shippingAddress: {
         name: shippingAddress.name,
         phone: shippingAddress.phone,
