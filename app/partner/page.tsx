@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
+import Image from "next/image"
 
 const benefits = [
   {
@@ -234,10 +235,12 @@ export default function PartnerPage() {
             {testimonials.map((testimonial) => (
               <div key={testimonial.name} className="bg-background p-6 rounded-xl border">
                 <div className="flex items-center gap-4 mb-4">
-                  <img
+                  <Image
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.name}
-                    className="w-14 h-14 rounded-full object-cover"
+                    width={56}
+                    height={56}
+                    className="rounded-full object-cover"
                   />
                   <div>
                     <h4 className="font-semibold">{testimonial.name}</h4>

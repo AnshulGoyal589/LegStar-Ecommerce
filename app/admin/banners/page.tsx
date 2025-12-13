@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import MultipleImageUpload from "@/components/MultipleImageUpload"
+import Image from "next/image"
 
 interface Banner {
   _id: string
@@ -221,9 +222,11 @@ export default function BannersPage() {
                 <button className="hidden sm:block cursor-grab text-muted-foreground hover:text-foreground">
                   <GripVertical className="h-5 w-5" />
                 </button>
-                <img
+                <Image
                   src={banner.image || "/placeholder.svg"}
                   alt={banner.title}
+                  width={128}
+                  height={64}
                   // MODIFIED: Image is larger on mobile, scales down on desktop
                   className="w-full h-32 sm:w-32 sm:h-16 object-cover rounded-md"
                 />
@@ -283,7 +286,7 @@ export default function BannersPage() {
                 key={banner._id}
                 className={`bg-background border rounded-lg overflow-hidden ${!banner.active ? "opacity-60" : ""}`}
               >
-                <img src={banner.image || "/placeholder.svg"} alt={banner.title} className="w-full h-32 object-cover" />
+                <Image  src={banner.image || "/placeholder.svg"} alt={banner.title} width={128} height={64} className="w-full h-32 object-cover" />
                 <div className="p-3 flex items-center justify-between">
                   <div>
                     <h3 className="font-medium text-sm">{banner.title}</h3>

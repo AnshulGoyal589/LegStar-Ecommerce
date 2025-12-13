@@ -198,7 +198,7 @@ export default function CartPage() {
                   )} */}
                   <div className="flex justify-between font-bold text-lg pt-3 border-t border-border">
                     <span>Total</span>
-                    <span>₹{total}</span>
+                    <span>₹{total.toFixed(2)}</span>
                   </div>
                 </div>
 

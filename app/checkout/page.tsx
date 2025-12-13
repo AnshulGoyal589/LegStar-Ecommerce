@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/lib/cart-context"
 import { useUser } from "@clerk/nextjs"
+import Image from "next/image"
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function CheckoutPage() {
 
   
   // const tax = Math.round((subtotal - discount) * 0.05)
-  const total = subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)
+  const total = (subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)).toFixed(2)
 
   const applyCoupon = async () => {
     
@@ -79,7 +80,7 @@ export default function CheckoutPage() {
           // Initialize Razorpay
           const options = {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: total * 100,
+            amount: Math.round(parseFloat(total) * 100),
             currency: "INR",
             name: "LegStar",
             description: "Purchase from LegStar",
@@ -268,7 +269,7 @@ export default function CheckoutPage() {
                     <p className="font-medium">Pay Online</p>
                     <p className="text-sm text-muted-foreground">Credit/Debit Card, UPI, Net Banking, Wallets</p>
                   </div>
-                  <img src="/placeholder.svg?height=24&width=100" alt="Razorpay" className="h-6" />
+                  <Image src="/placeholder.svg?height=24&width=100" alt="Razorpay" width={100} height={24} className="h-6" />
                 </label>
                 <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                   <RadioGroupItem value="cod" id="cod" />
@@ -290,9 +291,11 @@ export default function CheckoutPage() {
               <div className="space-y-3 max-h-64 overflow-auto mb-4">
                 {items.map((item: any, index) => (
                   <div key={`${item.name}-${item.size}-${item.color}-${index}`} className="flex gap-3">
-                    <img
+                    <Image
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 object-cover rounded"
                     />
                     <div className="flex-1 min-w-0">

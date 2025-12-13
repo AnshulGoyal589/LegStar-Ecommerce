@@ -5,7 +5,8 @@ import { ArrowLeft, Package, Truck, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getOrdersByUserId } from "@/lib/db/orders"
-
+// import { DeleteOrderButton } from "@/components/DeleteOrderButton" // Import the new component
+import Image from "next/image"
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -82,9 +83,11 @@ export default async function OrdersPage() {
                   <div className="space-y-4">
                     {order.items.map((item, index) => (
                       <div key={index} className="flex items-center gap-4">
-                        <img
+                        <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
+                          width={64}
+                          height={64}
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">
@@ -93,11 +96,13 @@ export default async function OrdersPage() {
                         </div>
                         <p className="font-medium">{item.price}</p>
                       </div>
-                    ))} 
+                    ))}
                   </div>
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <p className="font-semibold">Total: {order.total}</p>
+                    
+                    {/* <DeleteOrderButton orderId={order.orderId} /> */}
                   </div>
                 </CardContent>
               </Card>

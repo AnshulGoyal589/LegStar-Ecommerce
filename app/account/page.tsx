@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { User, Package, MapPin, Heart, CreditCard, Settings, ChevronRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
 
 const menuItems = [
   { icon: Package, label: "My Orders", href: "/account/orders", description: "Track, return, or buy things again" },
@@ -35,9 +36,11 @@ export default async function AccountPage() {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
                 {user.imageUrl ? (
-                  <img
+                  <Image
                     src={user.imageUrl || "/placeholder.svg"}
                     alt={user.firstName || ""}
+                    width={64}
+                    height={64}
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (

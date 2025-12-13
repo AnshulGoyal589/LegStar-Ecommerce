@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function Footer() {
   return (
@@ -124,10 +125,10 @@ export function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/60">
             <p>© 2025 LegStar. All rights reserved.</p>
             <div className="flex items-center gap-4">
-              <img src="/placeholder.svg?height=24&width=40" alt="Visa" className="h-6" />
-              <img src="/placeholder.svg?height=24&width=40" alt="Mastercard" className="h-6" />
-              <img src="/placeholder.svg?height=24&width=40" alt="RuPay" className="h-6" />
-              <img src="/placeholder.svg?height=24&width=40" alt="UPI" className="h-6" />
+              <Image src="/placeholder.svg?height=24&width=40" alt="Visa" width={40} height={24} className="h-6" />
+              <Image src="/placeholder.svg?height=24&width=40" alt="Mastercard" width={40} height={24} className="h-6" />
+              <Image src="/placeholder.svg?height=24&width=40" alt="RuPay" width={40} height={24} className="h-6" />
+              <Image src="/placeholder.svg?height=24&width=40" alt="UPI" width={40} height={24} className="h-6" />
             </div>
           </div>
         </div>

@@ -333,10 +333,10 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem >
+                  <DropdownMenuItem asChild>
                     <Link href="/sign-in">Sign In</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem >
+                  <DropdownMenuItem asChild>
                     <Link href="/sign-up">Create Account</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
