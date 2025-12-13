@@ -13,14 +13,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
-    // const expectedSignature = crypto
-    //   .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET || "")
-    //   .update(body)
-    //   .digest("hex")
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET || "")
+      .update(body)
+      .digest("hex")
 
-    // if (signature !== expectedSignature) {
-    //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
-    // }
+    if (signature !== expectedSignature) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    }
 
     const payload = JSON.parse(body)
     const event = payload.event
