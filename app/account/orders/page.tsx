@@ -35,7 +35,7 @@ export default async function OrdersPage() {
   const user = await currentUser()
 
   if (!user) {
-    redirect("/sign-in")
+    redirect("/")
   }
 
   const orders = await getOrdersByUserId(user.id)
@@ -98,16 +98,6 @@ export default async function OrdersPage() {
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <p className="font-semibold">Total: {order.total}</p>
-                    {/* <div className="flex gap-2"> 
-                      {order.status === "shipped" && (
-                        <Button variant="outline" size="sm">
-                          Track Order
-                        </Button>
-                      )}
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                    </div> */}
                   </div>
                 </CardContent>
               </Card>

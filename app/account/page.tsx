@@ -6,22 +6,22 @@ import { Card, CardContent } from "@/components/ui/card"
 
 const menuItems = [
   { icon: Package, label: "My Orders", href: "/account/orders", description: "Track, return, or buy things again" },
-  { icon: MapPin, label: "Addresses", href: "/account/addresses", description: "Manage your delivery addresses" },
-  { icon: Heart, label: "Wishlist", href: "/account/wishlist", description: "Your saved items" },
-  { icon: CreditCard, label: "Payment Methods", href: "/account/payments", description: "Manage payment options" },
-  {
-    icon: Settings,
-    label: "Account Settings",
-    href: "/account/settings",
-    description: "Update your profile and preferences",
-  },
+  // { icon: MapPin, label: "Addresses", href: "/account/addresses", description: "Manage your delivery addresses" },
+  // { icon: Heart, label: "Wishlist", href: "/account/wishlist", description: "Your saved items" },
+  // { icon: CreditCard, label: "Payment Methods", href: "/account/payments", description: "Manage payment options" },
+  // {
+  //   icon: Settings,
+  //   label: "Account Settings",
+  //   href: "/account/settings",
+  //   description: "Update your profile and preferences",
+  // },
 ]
 
 export default async function AccountPage() {
   const user = await currentUser()
 
   if (!user) {
-    redirect("/sign-in")
+    redirect("/")
   }
 
   return (

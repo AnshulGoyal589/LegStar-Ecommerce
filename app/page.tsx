@@ -19,7 +19,7 @@ export default async function HomePage() {
   const serializedProducts = JSON.parse(JSON.stringify(featuredProducts))
   // const serializedCategories = JSON.parse(JSON.stringify(allCategories))
   const serializedBanners = JSON.parse(JSON.stringify(heroBanners))
-  console.log("Hero Banners:", serializedBanners)
+  // console.log("Hero Banners:", serializedBanners)
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">

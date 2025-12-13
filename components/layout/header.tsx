@@ -102,7 +102,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Mobile menu */}
           <Sheet>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger className="md:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
@@ -127,10 +127,10 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                 </SignedIn>
                 <SignedOut>
                   <div className="flex gap-2 pb-4 border-b">
-                    <Button asChild className="flex-1">
+                    <Button  className="flex-1">
                       <Link href="/sign-in">Sign In</Link>
                     </Button>
-                    <Button asChild variant="outline" className="flex-1 bg-transparent">
+                    <Button  variant="outline" className="flex-1 bg-transparent">
                       <Link href="/sign-up">Sign Up</Link>
                     </Button>
                   </div>
@@ -294,7 +294,7 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
 
             <SignedIn>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger >
                   <Button variant="ghost" size="icon">
                     <User className="h-5 w-5" />
                   </Button>
@@ -307,10 +307,10 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
                     <p className="text-xs text-muted-foreground truncate">{user?.emailAddresses[0]?.emailAddress}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem >
                     <Link href="/account">My Account</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem >
                     <Link href="/account/orders">My Orders</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -327,16 +327,16 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
             </SignedIn>
             <SignedOut>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger >
                   <Button variant="ghost" size="icon">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem >
                     <Link href="/sign-in">Sign In</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem >
                     <Link href="/sign-up">Create Account</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

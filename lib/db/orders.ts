@@ -183,3 +183,9 @@ export async function generateOrderId() {
   const year = new Date().getFullYear()
   return `ORD-${year}-${String(seq).padStart(6, "0")}`
 }
+
+export const deleteOrder = async (id: string) => {
+  const db = await getDb()
+  const collection = db.collection<Order>("orders")
+  return collection.deleteOne({ _id: new ObjectId(id) })
+}
