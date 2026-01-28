@@ -9,16 +9,6 @@ export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
     await auth.protect()
   }
-
-  // if (isAdminRoute(req)) {
-  //   const { userId } = await auth.protect()
-
-  //   const adminIds = process.env.ADMIN_CLERK_IDS?.split(",").map((id) => id.trim()) || []
-
-  //   if (!adminIds.includes(userId)) {
-  //     return NextResponse.redirect(new URL("/", req.url))
-  //   }
-  // }
 })
 
 export const config = {

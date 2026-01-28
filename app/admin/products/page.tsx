@@ -246,7 +246,7 @@ export default function ProductsPage() {
                       </td>
                       <td className="p-4">
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger>
                             <Button variant="ghost" size="icon">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>

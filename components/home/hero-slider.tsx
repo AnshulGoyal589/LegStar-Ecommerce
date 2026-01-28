@@ -54,8 +54,8 @@ export function HeroSlider({ banners }: { banners: BannerClient[] }) {
     >
       {/* 5. Map over the dynamic 'banners' prop */}
       {banners.map((banner, index) => (
+        <Link href='/products' key={banner._id}>
         <div
-          key={banner._id}
           className={cn(
             "absolute inset-0 transition-opacity duration-700",
             index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0",
@@ -74,15 +74,16 @@ export function HeroSlider({ banners }: { banners: BannerClient[] }) {
           </div>
 
           {/* Content - Adapted for the simpler Banner schema */}
-          <div className="relative h-full container mx-auto px-4 flex items-center">
+          {/* <div className="relative h-full container mx-auto px-4 flex items-center">
             <div className="max-w-xl text-card mr-auto">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-8 text-balance">{banner.title}</h1>
               <Button asChild size="lg" className="bg-[#e6d8b2] text-foreground hover:bg-[#d4c9a3] font-medium">
                 <Link href={banner.link}>Shop Now</Link>
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
+        </Link>
       ))}
 
       {/* Navigation Arrows - Logic remains the same */}

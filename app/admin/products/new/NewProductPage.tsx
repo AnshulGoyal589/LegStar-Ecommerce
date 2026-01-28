@@ -17,6 +17,9 @@ import type { CheckedState } from "@radix-ui/react-checkbox"
 // Import the new component
 import MultipleImageUpload from "@/components/MultipleImageUpload"
 
+
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
+
 // --- TYPES for client-side data ---
 export interface CategoryClient {
   _id: string
@@ -35,18 +38,18 @@ interface CategoryOption {
 }
 
 // --- Constants & Helpers ---
-const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
-const COLOR_MAP: Record<string, string> = {
-  White: "#FFFFFF",
-  Black: "#000000",
-  Navy: "#000080",
-  Grey: "#808080",
-  Skin: "#F1C27D",
-  Pink: "#FFC0CB",
-  Blue: "#0000FF",
-  Red: "#FF0000",
-}
-const COLORS = Object.keys(COLOR_MAP)
+// const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
+// const COLOR_MAP: Record<string, string> = {
+//   White: "#FFFFFF",
+//   Black: "#000000",
+//   Navy: "#000080",
+//   Grey: "#808080",
+//   Skin: "#F1C27D",
+//   Pink: "#FFC0CB",
+//   Blue: "#0000FF",
+//   Red: "#FF0000",
+// }
+// const COLORS = Object.keys(COLOR_MAP)
 
 export default function NewProductPage({ allCategories }: { allCategories: CategoryClient[] }) {
   const router = useRouter()
@@ -57,7 +60,9 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
   const [images, setImages] = useState<string[]>([]) // Store URLs directly
   const [category, setCategory] = useState("")
   const [status, setStatus] = useState("draft")
-  const [variants, setVariants] = useState([{ size: "M", color: "White", stock: 50, price: 499 }])
+  const [variants, setVariants] = useState([
+    { size: "M", colorName: "White", colorHex: "#FFFFFF", stock: 50, price: 499 },
+  ])
   const [isFeatured, setIsFeatured] = useState(false)
 
   const categoryOptions = useMemo((): CategoryOption[] => {
@@ -84,7 +89,8 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
   }, [allCategories])
 
   // --- Handlers ---
-  const addVariant = () => setVariants([...variants, { size: "M", color: "White", stock: 0, price: 0 }])
+  const addVariant = () =>
+    setVariants([...variants, { size: "M", colorName: "", colorHex: "#000000", stock: 0, price: 0 }])
   const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index))
   const updateVariant = (index: number, field: string, value: string | number) => {
     const updated = [...variants]
@@ -125,11 +131,18 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
 
       const totalStock = variants.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0)
       const uniqueSizes = Array.from(new Set(variants.map((v) => v.size)))
-      const uniqueColorNames = Array.from(new Set(variants.map((v) => v.color)))
-      const colorObjects = uniqueColorNames.map((name) => ({
-        name,
-        hex: COLOR_MAP[name] || "#000000",
-      }))
+      // const uniqueColorNames = Array.from(new Set(variants.map((v) => v.color)))
+      const uniqueColorsMap = new Map<string, { name: string; hex: string }>()
+      variants.forEach((variant) => {
+        // Use a case-insensitive check to avoid duplicate color names like "Black" and "black"
+        if (variant.colorName && !uniqueColorsMap.has(variant.colorName.toLowerCase())) {
+          uniqueColorsMap.set(variant.colorName.toLowerCase(), {
+            name: variant.colorName,
+            hex: variant.colorHex || "#000000",
+          })
+        }
+      })
+      const colorObjects = Array.from(uniqueColorsMap.values())
 
       const payload = {
         name,
@@ -159,7 +172,10 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
           title: formData.get("metaTitle"),
           description: formData.get("metaDesc"),
         },
-        variantsData: variants,
+        variantsData: variants.map(({ colorName, colorHex, ...rest }) => ({
+          ...rest,
+          color: colorName, // Assuming the API expects a 'color' field with the name
+        })),
       }
 
       const response = await fetch("/api/admin/products", {
@@ -282,7 +298,7 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
               <div className="space-y-4">
                 {variants.map((variant, index) => (
                   <div key={index} className="flex items-end gap-4 p-4 bg-muted/50 rounded-lg">
-                    <div className="flex-1 grid grid-cols-4 gap-4">
+                    <div className="flex-1 grid grid-cols-5 gap-4">
                       <div className="space-y-2">
                         <Label>Size</Label>
                         <Select value={variant.size} onValueChange={(v) => updateVariant(index, "size", v)}>
@@ -296,18 +312,22 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
                           </SelectContent>
                         </Select>
                       </div>
+                      <div className="space-y-2 col-span-2">
+                        <Label>Color Name</Label>
+                        <Input
+                          placeholder="e.g., Midnight Blue"
+                          value={variant.colorName}
+                          onChange={(e) => updateVariant(index, "colorName", e.target.value)}
+                        />
+                      </div>
                       <div className="space-y-2">
-                        <Label>Color</Label>
-                        <Select value={variant.color} onValueChange={(v) => updateVariant(index, "color", v)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Color" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {COLORS.map((c) => (
-                              <SelectItem key={c} value={c}>{c}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Label>Hex</Label>
+                        <Input
+                          type="color"
+                          value={variant.colorHex}
+                          onChange={(e) => updateVariant(index, "colorHex", e.target.value)}
+                          className="p-1 h-10 w-full"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label>Stock</Label>
@@ -435,9 +455,9 @@ export default function NewProductPage({ allCategories }: { allCategories: Categ
 
           {/* Actions */}
           <div className="flex gap-2">
-            <Button type="button" variant="outline" className="flex-1 bg-transparent" disabled={isLoading}>
+            {/* <Button type="button" variant="outline" className="flex-1 bg-transparent" disabled={isLoading}>
               Save Draft
-            </Button>
+            </Button> */}
             <Button type="submit" className="flex-1" disabled={isLoading}>
               {isLoading ? (
                 <>

@@ -28,17 +28,18 @@ interface CategoryOption {
 
 interface Variant {
   size: string
-  color: string
+  colorName: string
+  colorHex: string
   stock: number
   price: number
 }
 
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
-const COLOR_MAP: Record<string, string> = {
-  White: "#FFFFFF", Black: "#000000", Navy: "#000080", Grey: "#808080",
-  Skin: "#F1C27D", Pink: "#FFC0CB", Blue: "#0000FF", Red: "#FF0000",
-}
-const COLORS = Object.keys(COLOR_MAP)
+// const COLOR_MAP: Record<string, string> = {
+//   White: "#FFFFFF", Black: "#000000", Navy: "#000080", Grey: "#808080",
+//   Skin: "#F1C27D", Pink: "#FFC0CB", Blue: "#0000FF", Red: "#FF0000",
+// }
+// const COLORS = Object.keys(COLOR_MAP)
 
 export interface CategoryClient {
   _id: string;
@@ -70,7 +71,23 @@ export default function EditProductForm({
   
   const [category, setCategory] = useState("") 
   const [status, setStatus] = useState(initialProduct.status || "active")
-  const [variants, setVariants] = useState<Variant[]>(initialProduct.variantsData?.length ? initialProduct.variantsData : [{ size: "M", color: "White", stock: 50, price: 499 }])
+  const [variants, setVariants] = useState<Variant[]>(() => {
+    if (!initialProduct.variantsData?.length) {
+      return [{ size: "M", colorName: "White", colorHex: "#FFFFFF", stock: 50, price: 499 }]
+    }
+    
+    // Create a lookup map for color names to hex codes from the product data
+    const initialColorMap = new Map(initialProduct.colors?.map(c => [c.name, c.hex]))
+    
+    return initialProduct.variantsData.map(v => ({
+      size: v.size,
+      stock: v.stock,
+      price: v.price,
+      colorName: v.color,
+      colorHex: initialColorMap.get(v.color) || "#000000", // Fallback to black
+    }))
+  })
+
   const [isFeatured, setIsFeatured] = useState(initialProduct.isFeatured || false)
   const [badge, setBadge] = useState(initialProduct.badge || "")
   const [tags, setTags] = useState(initialProduct.tags?.join(", ") || "")
@@ -107,7 +124,7 @@ export default function EditProductForm({
   }, [categoryOptions, initialProduct])
 
   // --- Variant Handlers ---
-  const addVariant = () => setVariants([...variants, { size: "M", color: "White", stock: 0, price: 0 }])
+  const addVariant = () => setVariants([...variants, { size: "M", colorName: "", colorHex: "#000000", stock: 0, price: 0 }])
   const removeVariant = (index: number) => setVariants(variants.filter((_, i) => i !== index))
   const updateVariant = (index: number, field: keyof Variant, value: string | number) => {
     const updated = [...variants]
@@ -136,8 +153,17 @@ export default function EditProductForm({
 
       const totalStock = variants.reduce((acc, curr) => acc + (Number(curr.stock) || 0), 0)
       const uniqueSizes = Array.from(new Set(variants.map((v) => v.size)))
-      const uniqueColorNames = Array.from(new Set(variants.map((v) => v.color)))
-      const colorObjects = uniqueColorNames.map((name) => ({ name, hex: COLOR_MAP[name] || "#000000" }))
+      // const uniqueColorNames = Array.from(new Set(variants.map((v) => v.color)))
+      const uniqueColorsMap = new Map<string, { name: string; hex: string }>()
+      variants.forEach((variant) => {
+        if (variant.colorName && !uniqueColorsMap.has(variant.colorName.toLowerCase())) {
+          uniqueColorsMap.set(variant.colorName.toLowerCase(), {
+            name: variant.colorName,
+            hex: variant.colorHex || "#000000",
+          })
+        }
+      })
+      const colorObjects = Array.from(uniqueColorsMap.values())
 
       const payload: Partial<Product> = {
         name,
@@ -162,7 +188,10 @@ export default function EditProductForm({
         costPerItem: parseFloat(costPerItem) || 0,
         isTaxable,
         seo: { title: metaTitle, description: metaDesc },
-        variantsData: variants,
+        variantsData: variants.map(({ colorName, colorHex, ...rest }) => ({
+          ...rest,
+          color: colorName, // The API expects a 'color' field with the name
+        })),
       }
 
       const response = await fetch(`/api/admin/products/${initialProduct._id}`, {
@@ -256,7 +285,24 @@ export default function EditProductForm({
                 <div key={index} className="flex items-end gap-4 p-4 bg-muted/50 rounded-lg">
                   <div className="flex-1 grid grid-cols-4 gap-4">
                     <div><Label>Size</Label><Select value={variant.size} onValueChange={(v) => updateVariant(index, "size", v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{SIZES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div>
-                    <div><Label>Color</Label><Select value={variant.color} onValueChange={(v) => updateVariant(index, "color", v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{COLORS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select></div>
+                    <div className="col-span-2">
+                      <Label>Color Name</Label>
+                      <Input 
+                        value={variant.colorName} 
+                        onChange={(e) => updateVariant(index, "colorName", e.target.value)} 
+                        placeholder="e.g., Ocean Blue"
+                      />
+                    </div>
+                    <div>
+                      <Label>Hex</Label>
+                      <Input 
+                        type="color" 
+                        value={variant.colorHex} 
+                        onChange={(e) => updateVariant(index, "colorHex", e.target.value)}
+                        className="p-1 h-10 w-full"
+                      />
+                    </div>
+
                     <div><Label>Stock</Label><Input type="number" value={variant.stock} onChange={(e) => updateVariant(index, "stock", parseInt(e.target.value) || 0)} /></div>
                     <div><Label>Price (₹)</Label><Input type="number" value={variant.price} onChange={(e) => updateVariant(index, "price", parseInt(e.target.value) || 0)} /></div>
                   </div>
