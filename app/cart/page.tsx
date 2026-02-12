@@ -17,8 +17,8 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState("")
   const [discount, setDiscount] = useState(0)
 
-  const shipping = subtotal >= 999 ? 0 : 99
-  const total = subtotal - discount + shipping
+  // const shipping = subtotal >= 999 ? 0 : 99
+  const total = subtotal - discount;
 
   const applyCoupon = () => {
     const response = fetch("/api/coupons/validate", {
@@ -183,10 +183,10 @@ export default function CartPage() {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>₹{subtotal}</span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
                     <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
-                  </div>
+                  </div> */}
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>

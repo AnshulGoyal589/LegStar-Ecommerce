@@ -265,7 +265,7 @@ export default function CategoriesPage() {
                       <p className="text-sm text-muted-foreground">{children.length} subcategories</p>
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger>
                         <Button variant="ghost" size="icon">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -307,7 +307,7 @@ export default function CategoriesPage() {
                           </div>
                         </div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger >
                             <Button variant="ghost" size="icon">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>

@@ -359,10 +359,10 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>{formatCurrency(selectedOrder.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
                     <span>{selectedOrder.shippingCost === 0 ? "Free" : formatCurrency(selectedOrder.shippingCost)}</span>
-                  </div>
+                  </div> */}
                   {selectedOrder.discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>

@@ -7,7 +7,7 @@ const categories = [
     id: "men",
     title: "Men's Collection",
     subtitle: "Comfort Redefined",
-    image: "https://res.cloudinary.com/dgzj1itlu/image/upload/v1764819230/infashion-1703672261_iplyp7.jpg",
+    image: "https://res.cloudinary.com/dkuhayoum/image/upload/v1770906325/imag_1_m4pew4.png",
     link: "/products/men",
   },
   {

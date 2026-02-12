@@ -71,17 +71,22 @@ export interface ShiprocketOrderPayload {
 export async function createShiprocketOrder(payload: ShiprocketOrderPayload) {
   const token = await getAuthToken()
 
-  const response = await fetch(`${SHIPROCKET_API_URL}/orders/create/adhoc`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  })
+  try{
+    const response = await fetch(`${SHIPROCKET_API_URL}/orders/create/adhoc`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    
 
-  const data = await response.json()
-  return data
+    const data = await response.json();
+    return data;
+  }catch(error){
+    console.error("Error creating Shiprocket order:", error
+  )};
 }
 
 export async function generateAWB(shipmentId: number, courierId?: number) {

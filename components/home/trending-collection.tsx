@@ -6,10 +6,10 @@ import { ArrowRight } from "lucide-react"
 const collections = [
   {
     id: "thermals",
-    title: "Winter Thermals",
-    subtitle: "Stay Warm & Cozy",
-    description: "Our premium thermal collection designed to keep you comfortable in the coldest weather",
-    image: "/placeholder.svg?height=500&width=800",
+    title: "Trendy Co-Ord Sets",
+    subtitle: "MATCH YOUR VIBE",
+    description: "Easy fits, bold styles, and everyday comfort — co-ords that keep you stylish without trying too hard.",
+    image: "https://res.cloudinary.com/dkuhayoum/image/upload/v1770906789/Gemini_Generated_Image_lk5xbalk5xbalk5x_h7n6cv.png",
     link: "/products/thermals",
     color: "bg-blue-900",
   },
@@ -18,7 +18,7 @@ const collections = [
     title: "Loungewear Edit",
     subtitle: "Comfort All Day",
     description: "Relax in style with our ultra-soft loungewear collection",
-    image: "/placeholder.svg?height=500&width=800",
+    image: "https://res.cloudinary.com/dkuhayoum/image/upload/v1770906387/image_2_qirvd9.png",
     link: "/products/loungewear",
     color: "bg-amber-900",
   },

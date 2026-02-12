@@ -32,17 +32,17 @@ export default function CheckoutPage() {
     pincode: "",
   })
 
-  const shippingCost = subtotal >= 999 ? 0 : 99
+  // const shippingCost = subtotal >= 999 ? 0 : 99
 
   
-  const total = (subtotal - discount + shippingCost + (paymentMethod==='cod' ? 10 : 0)).toFixed(0)
+  const total = (subtotal - discount + (paymentMethod==='cod' ? 10 : 0)).toFixed(0)
 
   const applyCoupon = async () => {
     
     const response = await fetch("/api/coupons/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: couponCode, orderTotal: subtotal + shippingCost + (paymentMethod==='cod' ? 10 : 0)  }),
+      body: JSON.stringify({ code: couponCode, orderTotal: subtotal + (paymentMethod==='cod' ? 10 : 0)  }),
     })
     const data = await response.json()
 
@@ -338,10 +338,10 @@ export default function CheckoutPage() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>₹{subtotal}</span>
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
                   <span>{shippingCost === 0 ? "FREE" : `₹${shippingCost}`}</span>
-                </div>
+                </div> */}
                 {
                   paymentMethod=='razorpay' ? null : (
                 <div className="flex justify-between">

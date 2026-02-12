@@ -4,6 +4,7 @@ import { createRazorpayOrder } from "@/lib/razorpay"
 import { createOrder, generateOrderId } from "@/lib/db/orders"
 import { validateCoupon, incrementCouponUsage } from "@/lib/db/coupons"
 import { ObjectId } from "mongodb"
+import { createShiprocketOrder, ShiprocketOrderPayload } from "@/lib/shiprocket"
 
 // Define a more accurate type for the items coming from the client cart
 export type IncomingCartItem = {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       subtotal: parseInt(amount),
       discount,
       couponCode: couponCode || undefined,
-      shippingCost:99,
+      shippingCost:0,
       // tax,
       total: parseInt(amount),
       shippingAddress: {
@@ -103,6 +104,43 @@ export async function POST(request: NextRequest) {
     if (couponCode && discount > 0) {
       await incrementCouponUsage(couponCode)
     }
+
+    // if (paymentMethod === "cod") {
+          try {
+            const shiprocketPayload: ShiprocketOrderPayload = {
+              order_id: orderId,
+              order_date: new Date().toISOString().split("T")[0],
+              pickup_location: "Primary",
+              billing_customer_name: shippingAddress.name.split(" ")[0],
+              billing_last_name: shippingAddress.name.split(" ").slice(1).join(" ") || "",
+              billing_address: shippingAddress.address,
+              billing_city: shippingAddress.city,
+              billing_pincode: shippingAddress.pincode,
+              billing_state: shippingAddress.state,
+              billing_country: "India",
+              billing_email: shippingAddress.email,
+              billing_phone: shippingAddress.phone,
+              shipping_is_billing: true,
+              order_items: (items as IncomingCartItem[]).map((item) => ({
+                name: item.product.name,  // Use nested product.name
+                sku: item.product.sku || `SKU-${item.product._id}`,
+                units: item.quantity,
+                selling_price: item.product.price,  // Use nested product.price (number)
+              })),
+              payment_method: "COD",
+              sub_total: parseInt(amount),
+              length: 20,
+              breadth: 15,
+              height: 10,
+              weight: 0.5,
+            }
+    
+            const data  = await createShiprocketOrder(shiprocketPayload);
+            // console.log("Shiprocket order created:", data)
+          } catch (shiprocketError) {
+            console.error("Shiprocket error:", shiprocketError)
+          }
+        // }
 
     return NextResponse.json({
       orderId,
