@@ -10,28 +10,14 @@ import {
   Package,
   FolderOpen,
   Tag,
-  Users,
   ShoppingCart,
-  Settings,
   Menu,
   X,
-  LogOut,
-  Bell,
   Search,
-  ChevronDown,
   ImageIcon,
-  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { Suspense } from "react"
 import { useClerk, useUser } from "@clerk/nextjs"
@@ -39,13 +25,12 @@ import { useClerk, useUser } from "@clerk/nextjs"
 const sidebarLinks = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/products", icon: Package, label: "Products" },
+  { href: "/admin/blogs", icon: FolderOpen, label: "Blogs" },
   { href: "/admin/categories", icon: FolderOpen, label: "Categories" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/coupons", icon: Tag, label: "Coupons" },
-  // { href: "/admin/customers", icon: Users, label: "Customers" },
   { href: "/admin/banners", icon: ImageIcon, label: "Banners" },
-  // { href: "/admin/pages", icon: FileText, label: "Pages" },
-  // { href: "/admin/settings", icon: Settings, label: "Settings" },
+  { href: "/admin/videos", icon: ImageIcon, label: "Videos" },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -59,12 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
-  // console.log("Admin User ID:", user.id);
-
   const adminIds = process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS?.split(",").map((id) => id.trim()) || []
-
-  // console.log("Admin IDs from env:", adminIds);
-  // console.log("Is Admin:", adminIds.includes(user.id));
 
   if (!adminIds.includes(user.id)) {
     return null;

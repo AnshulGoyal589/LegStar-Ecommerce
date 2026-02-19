@@ -111,17 +111,18 @@ export interface ComboProduct {
 }
 
 export interface Blog {
-  _id: string
-  title: string
-  slug: string
-  excerpt: string
-  content: string
-  image: string
-  author: string
-  tags: string[]
-  isPublished: boolean
-  createdAt: Date
-  updatedAt: Date
+  _id?: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;         // The URL
+  imagePublicId?: string; // Add this to track the Cloudinary ID
+  author: string;
+  tags: string[];
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface B2BLead {

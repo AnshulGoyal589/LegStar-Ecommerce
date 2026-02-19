@@ -22,7 +22,7 @@ export async function getBlogBySlug(slug: string) {
 export async function getBlogById(id: string) {
   const client = await clientPromise
   const db = client.db("legstar")
-  return db.collection<Blog>("blogs").findOne({ _id: new ObjectId(id) })
+  return db.collection<Blog>("blogs").findOne({ _id: new ObjectId(id) } as any)
 }
 
 export async function createBlog(blog: Omit<Blog, "_id" | "createdAt" | "updatedAt">) {
@@ -33,17 +33,28 @@ export async function createBlog(blog: Omit<Blog, "_id" | "createdAt" | "updated
     createdAt: new Date(),
     updatedAt: new Date(),
   })
-  return result
+  return result.acknowledged
 }
 
-export async function updateBlog(id: string, blog: Partial<Blog>) {
+export async function updateBlog(id: string, blog: any) {
   const client = await clientPromise
   const db = client.db("legstar")
-  return db.collection("blogs").updateOne({ _id: new ObjectId(id) }, { $set: { ...blog, updatedAt: new Date() } })
+  const result = await db.collection("blogs").updateOne(
+    { _id: new ObjectId(id) }, 
+    { $set: blog }
+  )
+  return result.acknowledged
 }
 
 export async function deleteBlog(id: string) {
   const client = await clientPromise
   const db = client.db("legstar")
   return db.collection("blogs").deleteOne({ _id: new ObjectId(id) })
+}
+
+
+export async function getAllBlogsForAdmin() {
+  const client = await clientPromise
+  const db = client.db("legstar")
+  return db.collection<Blog>("blogs").find().sort({ createdAt: -1 }).toArray()
 }

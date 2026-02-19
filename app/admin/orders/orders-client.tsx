@@ -109,10 +109,10 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
           <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
           <p className="text-muted-foreground">Manage and track customer orders</p>
         </div>
-        <Button variant="outline" className="gap-2">
+        {/* <Button variant="outline" className="gap-2">
           <Download className="h-4 w-4" />
           Export CSV
-        </Button>
+        </Button> */}
       </div>
 
       {/* Filters */}
@@ -199,7 +199,7 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
                     </td>
                     <td className="p-4 text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger >
                           <Button variant="ghost" size="icon" className="h-8 w-8">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -208,12 +208,12 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
                           <DropdownMenuItem onClick={() => setSelectedOrder(order)} className="gap-2 cursor-pointer">
                             <Eye className="h-4 w-4" /> View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 cursor-pointer">
+                          {/* <DropdownMenuItem className="gap-2 cursor-pointer">
                             <Truck className="h-4 w-4" /> Update Status
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2 text-red-600 focus:text-red-600 cursor-pointer">
                             <XCircle className="h-4 w-4" /> Cancel Order
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -381,14 +381,14 @@ export default function OrdersClient({ initialOrders, initialTotal }: OrdersClie
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-4">
+              {/* <div className="flex gap-2 pt-4">
                 <Button className="flex-1 gap-2">
                   <Truck className="h-4 w-4" /> Update Shipment
                 </Button>
                 <Button variant="outline" className="flex-1 gap-2">
                   <Download className="h-4 w-4" /> Invoice
                 </Button>
-              </div>
+              </div> */}
             </div>
           )}
         </DialogContent>

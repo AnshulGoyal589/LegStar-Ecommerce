@@ -31,6 +31,19 @@ export async function uploadMultipleImages(
   return Promise.all(uploadPromises)
 }
 
+export async function uploadVideo(file: string, folder = "legstar/promotional-videos"): Promise<{ url: string; publicId: string }> {
+  const result = await cloudinary.uploader.upload(file, {
+    folder,
+    resource_type: "video", // CRITICAL: Tell Cloudinary this is a video
+    chunk_size: 6000000,    // Supports larger files
+  })
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  }
+}
+
 export default cloudinary
 
 

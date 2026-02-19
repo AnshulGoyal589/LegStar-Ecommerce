@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 import { Header } from "@/components/layout/header"
 import { getCategories } from "@/lib/db/categories"
+import { recordVisit } from "@/lib/actions/analytics"
+import { headers } from "next/headers"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -26,6 +28,13 @@ export default async function RootLayout({
 }>) {
   const allCategories = await getCategories() 
   const serializedCategories = JSON.parse(JSON.stringify(allCategories))
+
+  const headerList = await headers();
+  const ip = headerList.get("x-forwarded-for") || "127.0.0.1";
+  const userAgent = headerList.get("user-agent") || "unknown";
+  
+  // Record the visit (don't 'await' if you don't want to slow down page load)
+  recordVisit(ip, userAgent).catch(err => console.error("Visit tracking error:", err));
 
   return (
     <ClerkProvider>

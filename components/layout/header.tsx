@@ -197,11 +197,13 @@ export function Header({ allCategories }: { allCategories: CategoryClient[] }) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {Object.entries(structuredCategories).map(([gender, data]) => (
+              
               <div
                 key={gender}
-                className="relative"
+                className={`relative ${data.categories.length === 0 ? "hidden" : ""}`}
                 onMouseEnter={() => setHoveredCategory(gender)}
                 onMouseLeave={() => setHoveredCategory(null)}
+                
               >
                 <Link
                   href={`/products/${gender}`}

@@ -61,7 +61,6 @@ export default function CheckoutPage() {
       if (paymentMethod === "razorpay") {
         // Create order and initiate Razorpay payment
 
-        // console.log("Initiating Razorpay payment for amount:", total);
         const response = await fetch("/api/payments/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
